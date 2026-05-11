@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/layout/Header';
 import {
   SummaryStatCards,
@@ -13,12 +13,113 @@ import {
   AiAnomalySummary,
   RecentAlertsCard,
 } from '../components/dashboard/DashboardSections';
+import {
+  getDashboardSummary,
+  getMaintenancePriority,
+  getMissingPersonAlert,
+  getRecentEvents,
+  getReconstructionRecommendation,
+  getRobotStatus,
+  getVacantHouses,
+} from '../api/dashboardApi';
+import type {
+  DashboardSummary,
+  MaintenancePriority,
+  MissingPersonAlert,
+  RecentEvent,
+  ReconstructionRecommendation,
+  RobotStatus,
+  VacantHouse,
+} from '../types/dashboard';
 
 const TABS = ['통합 대시보드', '빈집 관리', '로봇 관제', 'AI 분석/추천', '실종자 알림'] as const;
 type TabType = typeof TABS[number];
 
+interface DashboardData {
+  summary: DashboardSummary;
+  robotStatus: RobotStatus;
+  vacantHouses: VacantHouse[];
+  recentEvents: RecentEvent[];
+  maintenancePriority: MaintenancePriority[];
+  reconstructionRecommendation: ReconstructionRecommendation;
+  missingPersonAlert: MissingPersonAlert;
+}
+
+function DashboardStateMessage({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-3xl border-[3px] border-white/70 bg-white/90 p-8 text-center shadow-[0_4px_20px_rgba(0,0,0,0.03)] backdrop-blur-sm">
+      <p className="text-[18px] font-black text-slate-700">{title}</p>
+      <p className="mt-2 text-[15px] font-bold text-slate-500">{description}</p>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<TabType>('통합 대시보드');
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadDashboardData() {
+      try {
+        setIsLoading(true);
+        setErrorMessage(null);
+
+        const [
+          summary,
+          robotStatus,
+          vacantHouses,
+          recentEvents,
+          maintenancePriority,
+          reconstructionRecommendation,
+          missingPersonAlert,
+        ] = await Promise.all([
+          getDashboardSummary(),
+          getRobotStatus(),
+          getVacantHouses(),
+          getRecentEvents(),
+          getMaintenancePriority(),
+          getReconstructionRecommendation(),
+          getMissingPersonAlert(),
+        ]);
+
+        if (!isMounted) return;
+
+        setDashboardData({
+          summary,
+          robotStatus,
+          vacantHouses,
+          recentEvents,
+          maintenancePriority,
+          reconstructionRecommendation,
+          missingPersonAlert,
+        });
+      } catch {
+        if (!isMounted) return;
+
+        setErrorMessage('대시보드 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadDashboardData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     // 전체 페이지 스크롤 스냅 & 고정된 배경 이미지 (Parallax 효과)
@@ -83,52 +184,70 @@ export default function DashboardPage() {
           </div>
 
           {/* 메인 콘텐츠 프레임 */}
-          <div className="animate-fade-in" key={`content-${activeTab}`}>
-            {activeTab === '통합 대시보드' && (
-              <div className="space-y-6">
-                <SummaryStatCards />
-                <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6">
-                  <VacantHouseMap />
-                  <div className="space-y-6">
-                    <RobotStatusSummary />
-                    <MissingPersonSummary />
+          {isLoading && (
+            <DashboardStateMessage
+              title="대시보드 데이터를 불러오는 중입니다"
+              description="영천시 빈집, 로봇 관제, AI 분석 정보를 준비하고 있습니다."
+            />
+          )}
+
+          {!isLoading && errorMessage && (
+            <DashboardStateMessage
+              title="데이터 연결 상태를 확인해 주세요"
+              description={errorMessage}
+            />
+          )}
+
+          {!isLoading && !errorMessage && dashboardData && (
+            <div className="animate-fade-in" key={`content-${activeTab}`}>
+              {activeTab === '통합 대시보드' && (
+                <div className="space-y-6">
+                  <SummaryStatCards summary={dashboardData.summary} />
+                  <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6">
+                    <VacantHouseMap vacantHouses={dashboardData.vacantHouses} />
+                    <div className="space-y-6">
+                      <RobotStatusSummary robotStatus={dashboardData.robotStatus} />
+                      <MissingPersonSummary missingPersonAlert={dashboardData.missingPersonAlert} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {activeTab === '빈집 관리' && (
-              <div className="space-y-6">
-                <VacantHouseMap />
-                <MaintenancePriorityTable />
-              </div>
-            )}
-
-            {activeTab === '로봇 관제' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <RobotVideoCard />
+              {activeTab === '빈집 관리' && (
                 <div className="space-y-6">
-                  <RobotStatusSummary />
-                  <RouteMapCard />
+                  <VacantHouseMap vacantHouses={dashboardData.vacantHouses} />
+                  <MaintenancePriorityTable maintenancePriorities={dashboardData.maintenancePriority} />
                 </div>
-              </div>
-            )}
+              )}
 
-            {activeTab === 'AI 분석/추천' && (
-              <div className="space-y-6">
-                <AiAnomalySummary />
-                <ReconstructionRecommendCard />
-                <RecentAlertsCard />
-              </div>
-            )}
+              {activeTab === '로봇 관제' && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <RobotVideoCard robotStatus={dashboardData.robotStatus} />
+                  <div className="space-y-6">
+                    <RobotStatusSummary robotStatus={dashboardData.robotStatus} />
+                    <RouteMapCard />
+                  </div>
+                </div>
+              )}
 
-            {activeTab === '실종자 알림' && (
-              <div className="space-y-6">
-                <MissingPersonDetailCard />
-                <RecentAlertsCard />
-              </div>
-            )}
-          </div>
+              {activeTab === 'AI 분석/추천' && (
+                <div className="space-y-6">
+                  <AiAnomalySummary />
+                  <ReconstructionRecommendCard
+                    reconstructionRecommendation={dashboardData.reconstructionRecommendation}
+                  />
+                  <RecentAlertsCard recentEvents={dashboardData.recentEvents} />
+                </div>
+              )}
+
+              {activeTab === '실종자 알림' && (
+                <div className="space-y-6">
+                  <MissingPersonDetailCard missingPersonAlert={dashboardData.missingPersonAlert} />
+                  <RecentAlertsCard recentEvents={dashboardData.recentEvents} />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
