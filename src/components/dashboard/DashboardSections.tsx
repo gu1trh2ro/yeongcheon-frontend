@@ -7,13 +7,9 @@ import type {
   RecentEvent,
   ReconstructionRecommendation,
   RobotStatus,
-  VacantHouse,
 } from '../../types/dashboard';
 
-const markerPos = [
-  { left: '22%', top: '32%' }, { left: '50%', top: '55%' },
-  { left: '68%', top: '28%' }, { left: '76%', top: '65%' }, { left: '34%', top: '70%' },
-];
+export { default as VacantHouseMap } from './VacantHouseMap';
 
 function fmt(v: string) {
   return new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(v));
@@ -48,40 +44,6 @@ export function SummaryStatCards({ summary }: { summary: DashboardSummary }) {
         </Card>
       ))}
     </div>
-  );
-}
-
-/* ── 빈집 지도 ── */
-export function VacantHouseMap({ vacantHouses }: { vacantHouses: VacantHouse[] }) {
-  return (
-    <Card title="영천시 빈집 분포 현황" eyebrow="공공데이터 기반">
-      <div className="relative h-[380px] rounded-3xl border-4 border-slate-50 bg-slate-100/50 overflow-hidden shadow-inner">
-        {/* 그리드 */}
-        <svg className="absolute inset-0 w-full h-full opacity-20">
-          <defs><pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M40 0L0 0 0 40" fill="none" stroke="#94A3B8" strokeWidth="2" strokeDasharray="4 4"/>
-          </pattern></defs>
-          <rect width="100%" height="100%" fill="url(#g)"/>
-        </svg>
-
-        {/* 라벨 */}
-        <div className="absolute left-4 top-4 bg-white/90 backdrop-blur-md border-2 border-amber-100 rounded-2xl px-4 py-2.5 shadow-sm">
-          <p className="text-[13px] font-black text-amber-500 tracking-wide flex items-center gap-1">⭐ 별의 도시 영천</p>
-          <p className="text-[16px] font-black text-slate-700 mt-1">빈집 위치 현황</p>
-        </div>
-
-        {/* 마커 */}
-        {vacantHouses.map((h, i) => (
-          <div key={h.houseId} className="group absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-            style={markerPos[i]} title={h.address}>
-            <span className={`block w-5 h-5 rounded-full border-4 border-white shadow-md transition-transform group-hover:scale-125 ${h.riskLevel === '위험' ? 'bg-rose-400' : 'bg-amber-400'}`} />
-            <span className="absolute left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap bg-slate-800 text-white rounded-xl px-3 py-1.5 text-[13px] font-bold opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-              {h.address.replace('영천시 ', '')}
-            </span>
-          </div>
-        ))}
-      </div>
-    </Card>
   );
 }
 
