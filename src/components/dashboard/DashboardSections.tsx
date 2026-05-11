@@ -1,10 +1,14 @@
-import Badge from '../common/Badge';
 import Card from '../common/Card';
 import ProgressBar, { CircularGauge } from '../common/ProgressBar';
-import {
-  dashboardSummary, maintenancePriorities, missingPersonAlert,
-  recentEvents, reconstructionRecommendation, robotStatus, vacantHouses,
-} from '../../data/mockData';
+import type {
+  DashboardSummary,
+  MaintenancePriority,
+  MissingPersonAlert,
+  RecentEvent,
+  ReconstructionRecommendation,
+  RobotStatus,
+  VacantHouse,
+} from '../../types/dashboard';
 
 const markerPos = [
   { left: '22%', top: '32%' }, { left: '50%', top: '55%' },
@@ -25,13 +29,13 @@ function Info({ label, value, highlight }: { label: string; value: string, highl
 }
 
 /* ── 요약 통계 ── */
-export function SummaryStatCards() {
+export function SummaryStatCards({ summary }: { summary: DashboardSummary }) {
   const items = [
-    { label: '전체 빈집', val: dashboardSummary.vacantHouseCount.toLocaleString(), unit: '호', color: 'text-slate-700' },
-    { label: '정비 완료율', val: dashboardSummary.maintenanceRate, unit: '%', color: 'text-emerald-500' },
-    { label: '운행 중 로봇', val: dashboardSummary.activeRobotCount, unit: '대', color: 'text-sky-500' },
-    { label: '오늘 순찰 거리', val: dashboardSummary.todayPatrolDistance, unit: 'km', color: 'text-slate-700' },
-    { label: '오늘 이상 탐지', val: dashboardSummary.todayAnomalyCount, unit: '건', color: 'text-rose-500' },
+    { label: '전체 빈집', val: summary.vacantHouseCount.toLocaleString(), unit: '호', color: 'text-slate-700' },
+    { label: '정비 완료율', val: summary.maintenanceRate, unit: '%', color: 'text-emerald-500' },
+    { label: '운행 중 로봇', val: summary.activeRobotCount, unit: '대', color: 'text-sky-500' },
+    { label: '오늘 순찰 거리', val: summary.todayPatrolDistance, unit: 'km', color: 'text-slate-700' },
+    { label: '오늘 이상 탐지', val: summary.todayAnomalyCount, unit: '건', color: 'text-rose-500' },
   ];
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
@@ -48,7 +52,7 @@ export function SummaryStatCards() {
 }
 
 /* ── 빈집 지도 ── */
-export function VacantHouseMap() {
+export function VacantHouseMap({ vacantHouses }: { vacantHouses: VacantHouse[] }) {
   return (
     <Card title="영천시 빈집 분포 현황" eyebrow="공공데이터 기반">
       <div className="relative h-[380px] rounded-3xl border-4 border-slate-50 bg-slate-100/50 overflow-hidden shadow-inner">
@@ -82,7 +86,7 @@ export function VacantHouseMap() {
 }
 
 /* ── 로봇 상태 ── */
-export function RobotStatusSummary() {
+export function RobotStatusSummary({ robotStatus }: { robotStatus: RobotStatus }) {
   return (
     <Card title="로봇 상태" eyebrow="자율주행 순찰">
       <div className="flex gap-6 items-center">
@@ -101,7 +105,11 @@ export function RobotStatusSummary() {
 }
 
 /* ── 실종자 요약 ── */
-export function MissingPersonSummary() {
+export function MissingPersonSummary({
+  missingPersonAlert,
+}: {
+  missingPersonAlert: MissingPersonAlert;
+}) {
   return (
     <Card>
       <div className="flex items-start justify-between border-b-2 border-slate-50 pb-4">
@@ -148,7 +156,7 @@ export function AiAnomalySummary() {
 }
 
 /* ── 로봇 영상 ── */
-export function RobotVideoCard() {
+export function RobotVideoCard({ robotStatus }: { robotStatus: RobotStatus }) {
   return (
     <Card title="실시간 카메라" eyebrow="로봇 영상 피드">
       <div className="relative h-[400px] bg-slate-100 border-4 border-slate-50 flex flex-col items-center justify-center rounded-3xl overflow-hidden shadow-inner">
@@ -191,7 +199,11 @@ export function RouteMapCard() {
 }
 
 /* ── 정비 우선순위 ── */
-export function MaintenancePriorityTable() {
+export function MaintenancePriorityTable({
+  maintenancePriorities,
+}: {
+  maintenancePriorities: MaintenancePriority[];
+}) {
   return (
     <Card title="정비 우선순위" eyebrow="위험도·노후도·생활권 분석">
       <div className="overflow-x-auto border-4 border-slate-50 rounded-3xl bg-white shadow-sm">
@@ -223,7 +235,11 @@ export function MaintenancePriorityTable() {
 }
 
 /* ── 재건축 추천 ── */
-export function ReconstructionRecommendCard() {
+export function ReconstructionRecommendCard({
+  reconstructionRecommendation,
+}: {
+  reconstructionRecommendation: ReconstructionRecommendation;
+}) {
   return (
     <Card title="재건축 용도 추천" eyebrow="AI 추천 · 공공데이터 기반">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -250,7 +266,7 @@ export function ReconstructionRecommendCard() {
 }
 
 /* ── 최근 알림 ── */
-export function RecentAlertsCard() {
+export function RecentAlertsCard({ recentEvents }: { recentEvents: RecentEvent[] }) {
   return (
     <Card title="최근 알림" eyebrow="관제 이벤트 로그">
       <div className="grid gap-4 md:grid-cols-2">
@@ -272,7 +288,11 @@ export function RecentAlertsCard() {
 }
 
 /* ── 실종자 상세 ── */
-export function MissingPersonDetailCard() {
+export function MissingPersonDetailCard({
+  missingPersonAlert,
+}: {
+  missingPersonAlert: MissingPersonAlert;
+}) {
   return (
     <Card title="실종자 후보 이벤트" eyebrow="담당자 확인 필요">
       <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
