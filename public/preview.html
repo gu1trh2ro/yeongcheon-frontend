@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>디자인 컨셉 비교 프리뷰</title>
+<link rel="stylesheet" href="/preview-styles.css">
+</head>
+<body>
+
+<div class="switcher">
+  <button class="active" onclick="show('a')">🌙 컨셉 A: 다크 관제센터</button>
+  <button onclick="show('b')">☀️ 컨셉 B: 밝은 SaaS</button>
+  <button onclick="show('c')">🔷 컨셉 C: 하이브리드</button>
+</div>
+
+<!-- ═══ CONCEPT A: Dark ═══ -->
+<div id="a" class="concept dark active">
+<div class="bg-stars"></div>
+<div class="wrap">
+  <aside class="sidebar">
+    <div class="logo"><div class="star">✦</div><h1>영천시 방범 대시보드<small>STAR CITY PLATFORM</small></h1></div>
+    <nav>
+      <a class="active" href="#">📊 통합 대시보드</a>
+      <a href="#">🏚️ 빈집 관리</a>
+      <a href="#">🤖 로봇 관제</a>
+      <a href="#">🧠 AI 분석/추천</a>
+      <a href="#">🔍 실종자 알림</a>
+    </nav>
+    <div class="sys-status">
+      <p><span class="dot" style="background:#22c55e"></span>관제 운영 중</p>
+      <p><span class="dot" style="background:#22d3ee"></span>AI 분석 활성화</p>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <h2>통합 대시보드</h2>
+      <div class="time" id="clock-a"></div>
+    </div>
+    <div class="stats">
+      <div class="stat-card"><div class="glow" style="background:#0ea5e9"></div><label>전체 빈집</label><div class="val" style="color:#38bdf8">147<span class="unit">호</span></div></div>
+      <div class="stat-card"><div class="glow" style="background:#22c55e"></div><label>정비 완료율</label><div class="val" style="color:#4ade80">32<span class="unit">%</span></div></div>
+      <div class="stat-card"><div class="glow" style="background:#06b6d4"></div><label>운행 로봇</label><div class="val" style="color:#22d3ee">3<span class="unit">대</span></div></div>
+      <div class="stat-card"><div class="glow" style="background:#6366f1"></div><label>순찰 거리</label><div class="val" style="color:#a5b4fc">28.5<span class="unit">km</span></div></div>
+      <div class="stat-card"><div class="glow" style="background:#ef4444"></div><label>이상 탐지</label><div class="val" style="color:#f87171">7<span class="unit">건</span></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="eyebrow">공공데이터 기반</div><h3>영천시 빈집 분포</h3>
+        <div class="map-area">
+          <svg class="constellation" viewBox="0 0 600 340">
+            <line x1="150" y1="130" x2="280" y2="180" /><line x1="280" y1="180" x2="380" y2="115" />
+            <line x1="380" y1="115" x2="450" y2="225" /><line x1="280" y1="180" x2="210" y2="240" />
+            <circle cx="150" cy="130" r="8" stroke="#ef4444" /><circle cx="280" cy="180" r="7" stroke="#f59e0b" />
+            <circle cx="380" cy="115" r="6" stroke="#22d3ee" /><circle cx="450" cy="225" r="7" stroke="#f59e0b" />
+            <circle cx="210" cy="240" r="6" stroke="#22c55e" />
+            <circle cx="150" cy="130" r="4" fill="#ef4444" class="pulse"/><circle cx="280" cy="180" r="3" fill="#f59e0b"/>
+            <circle cx="380" cy="115" r="3" fill="#22d3ee"/><circle cx="450" cy="225" r="3" fill="#f59e0b"/>
+            <circle cx="210" cy="240" r="3" fill="#22c55e"/>
+          </svg>
+          <div class="map-label"><p>STAR CITY YEONGCHEON</p><h4>영천시 빈집 분포</h4></div>
+          <div class="legend">
+            <span style="color:#f87171">● 위험</span><span style="color:#fbbf24">● 주의</span>
+            <span style="color:#22d3ee">● 관심</span><span style="color:#4ade80">● 정비완료</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;gap:16px">
+        <div class="card">
+          <div class="eyebrow">자율주행 방범</div><h3>로봇 상태</h3>
+          <div style="text-align:center">
+            <div class="battery-ring"><svg viewBox="0 0 80 80" width="80" height="80"><circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,.08)"/><circle cx="40" cy="40" r="34" stroke="#4ade80" stroke-dasharray="167" stroke-dashoffset="37" stroke-linecap="round"/></svg></div>
+            <div style="font-size:22px;font-weight:900;color:#4ade80">78%</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px">배터리</div>
+          </div>
+          <div style="margin-top:14px">
+            <div class="info-row"><span class="k">로봇 ID</span><span class="v">YC-ROBOT-01</span></div>
+            <div class="info-row"><span class="k">상태</span><span class="v"><span class="badge badge-green">운행 중</span></span></div>
+            <div class="info-row"><span class="k">현재 위치</span><span class="v">완산동 123-4</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="eyebrow">담당자 확인 필요</div><h3>실종자 후보 알림</h3>
+          <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);border-radius:14px;padding:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-weight:800;color:#fca5a5">실종자 후보 발견</span>
+              <span class="badge badge-red pulse">긴급</span>
+            </div>
+            <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div><span style="font-size:10px;color:#64748b">유사도</span><div style="font-size:18px;font-weight:900;color:#f87171">82%</div></div>
+              <div><span style="font-size:10px;color:#64748b">위치</span><div style="font-size:13px;font-weight:700;color:#e2e8f0">완산동 123-4</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">관제 이벤트 로그</div><h3>최근 알림</h3>
+      <div class="alert-list" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="alert-item"><div class="alert-dot" style="background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.5)"></div><div><h4>실종자 후보 발견</h4><p>완산동 123-4 · 14:30</p></div></div>
+        <div class="alert-item"><div class="alert-dot" style="background:#f59e0b"></div><div><h4>빈집 이상 징후 탐지</h4><p>도림동 456-7 · 13:20</p></div></div>
+        <div class="alert-item"><div class="alert-dot" style="background:#22d3ee"></div><div><h4>로봇 배터리 점검</h4><p>금호읍 순찰 구간 · 12:45</p></div></div>
+        <div class="alert-item"><div class="alert-dot" style="background:#22c55e"></div><div><h4>완산동 순찰 완료</h4><p>완산동 2구역 · 11:40</p></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+
+<!-- ═══ CONCEPT B: Bright ═══ -->
+<div id="b" class="concept bright">
+  <div class="hero">
+    <div class="title-row">
+      <h1>영천시 빈집 관리 및 자율주행 방범 대시보드<small>✦ STAR CITY SMART SAFETY PLATFORM</small></h1>
+      <div class="badges"><span>🟢 관제 운영 중</span><span>🔵 AI 분석 활성화</span><span id="clock-b"></span></div>
+    </div>
+    <div class="tabs">
+      <button class="active">통합 대시보드</button><button>빈집 관리</button>
+      <button>로봇 관제</button><button>AI 분석/추천</button><button>실종자 알림</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stats">
+      <div class="stat-card" style="border-color:#0ea5e9"><label>전체 빈집</label><div class="val" style="color:#0284c7">147<span class="unit">호</span></div></div>
+      <div class="stat-card" style="border-color:#22c55e"><label>정비 완료율</label><div class="val" style="color:#16a34a">32<span class="unit">%</span></div></div>
+      <div class="stat-card" style="border-color:#06b6d4"><label>운행 로봇</label><div class="val" style="color:#0891b2">3<span class="unit">대</span></div></div>
+      <div class="stat-card" style="border-color:#8b5cf6"><label>순찰 거리</label><div class="val" style="color:#7c3aed">28.5<span class="unit">km</span></div></div>
+      <div class="stat-card" style="border-color:#ef4444"><label>이상 탐지</label><div class="val" style="color:#dc2626">7<span class="unit">건</span></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="eyebrow">공공데이터 기반</div><h3>영천시 빈집 분포</h3>
+        <div class="map-area">
+          <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 600 340">
+            <path d="M100 200 C180 120,260 160,340 100 S460 90,540 160" fill="none" stroke="rgba(14,165,233,.3)" stroke-width="2"/>
+            <path d="M80 250 C200 220,300 270,420 210" fill="none" stroke="rgba(245,158,11,.25)" stroke-dasharray="6 8" stroke-width="2"/>
+            <circle cx="150" cy="160" r="8" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+            <circle cx="300" cy="175" r="7" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+            <circle cx="400" cy="120" r="6" fill="#06b6d4" stroke="#fff" stroke-width="2"/>
+            <circle cx="460" cy="230" r="7" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+            <circle cx="220" cy="245" r="6" fill="#22c55e" stroke="#fff" stroke-width="2"/>
+          </svg>
+          <div class="map-label"><p>STAR CITY YEONGCHEON</p><h4>영천시 빈집 분포</h4></div>
+          <div class="legend">
+            <span class="badge-red" style="padding:3px 8px;border-radius:999px;background:#fef2f2;font-size:11px;font-weight:700">● 위험</span>
+            <span class="badge-amber" style="padding:3px 8px;border-radius:999px;background:#fffbeb;font-size:11px;font-weight:700">● 주의</span>
+            <span class="badge-cyan" style="padding:3px 8px;border-radius:999px;background:#ecfeff;font-size:11px;font-weight:700">● 관심</span>
+            <span class="badge-green" style="padding:3px 8px;border-radius:999px;background:#f0fdf4;font-size:11px;font-weight:700">● 정비완료</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;gap:16px">
+        <div class="card">
+          <div class="eyebrow">자율주행 방범</div><h3>로봇 상태</h3>
+          <div style="text-align:center">
+            <div class="battery-ring"><svg viewBox="0 0 80 80" width="80" height="80"><circle cx="40" cy="40" r="34" stroke="#e2e8f0"/><circle cx="40" cy="40" r="34" stroke="#22c55e" stroke-dasharray="167" stroke-dashoffset="37" stroke-linecap="round"/></svg></div>
+            <div style="font-size:22px;font-weight:900;color:#16a34a">78%</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px">배터리</div>
+          </div>
+          <div style="margin-top:14px">
+            <div class="info-row"><span class="k">로봇 ID</span><span class="v">YC-ROBOT-01</span></div>
+            <div class="info-row"><span class="k">상태</span><span class="v"><span class="badge badge-green">운행 중</span></span></div>
+            <div class="info-row"><span class="k">현재 위치</span><span class="v">완산동 123-4</span></div>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid #ef4444">
+          <div class="eyebrow" style="color:#dc2626">담당자 확인 필요</div><h3>실종자 후보 알림</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:#fef2f2;border-radius:12px;padding:12px"><span style="font-size:10px;color:#64748b">유사도</span><div style="font-size:22px;font-weight:900;color:#dc2626">82%</div></div>
+            <div style="background:#fef2f2;border-radius:12px;padding:12px"><span style="font-size:10px;color:#64748b">위치</span><div style="font-size:13px;font-weight:700;color:#1e293b;margin-top:4px">완산동 123-4</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">관제 이벤트 로그</div><h3>최근 알림</h3>
+      <div class="alert-list" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="alert-item"><div class="alert-dot" style="background:#ef4444"></div><div><h4>실종자 후보 발견</h4><p>완산동 123-4 · 14:30</p></div></div>
+        <div class="alert-item"><div class="alert-dot" style="background:#f59e0b"></div><div><h4>빈집 이상 징후 탐지</h4><p>도림동 456-7 · 13:20</p></div></div>
+        <div class="alert-item"><div class="alert-dot" style="background:#06b6d4"></div><div><h4>로봇 배터리 점검</h4><p>금호읍 순찰 구간 · 12:45</p></div></div>
+        <div class="alert-item"><div class="alert-dot" style="background:#22c55e"></div><div><h4>완산동 순찰 완료</h4><p>완산동 2구역 · 11:40</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONCEPT C: Hybrid ═══ -->
+<div id="c" class="concept hybrid">
+<div class="wrap">
+  <aside class="sidebar">
+    <div class="logo"><div class="star">✦</div><h1>영천시 방범 대시보드<small>STAR CITY PLATFORM</small></h1></div>
+    <nav>
+      <a class="active" href="#"><span class="icon">📊</span> 통합 대시보드</a>
+      <a href="#"><span class="icon">🏚️</span> 빈집 관리</a>
+      <a href="#"><span class="icon">🤖</span> 로봇 관제</a>
+      <a href="#"><span class="icon">🧠</span> AI 분석/추천</a>
+      <a href="#"><span class="icon">🔍</span> 실종자 알림</a>
+    </nav>
+    <div class="sys-status">
+      <p><span class="dot" style="background:#22c55e"></span> 시스템 정상</p>
+      <p><span class="dot" style="background:#22d3ee"></span> AI 활성</p>
+      <p style="margin-top:8px;font-size:10px;color:#475569">운영자: 관제센터 A</p>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <h2>통합 대시보드</h2>
+      <div class="right">
+        <div class="notif">🔔<span class="count">3</span></div>
+        <div class="time" id="clock-c"></div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat-card"><div class="icon-circle" style="background:#dbeafe;color:#2563eb">🏠</div><div><label>전체 빈집</label><div class="val" style="color:#1d4ed8">147<span class="unit">호</span></div></div></div>
+      <div class="stat-card"><div class="icon-circle" style="background:#dcfce7;color:#16a34a">✓</div><div><label>정비 완료율</label><div class="val" style="color:#16a34a">32<span class="unit">%</span></div></div></div>
+      <div class="stat-card"><div class="icon-circle" style="background:#cffafe;color:#0891b2">🤖</div><div><label>운행 로봇</label><div class="val" style="color:#0891b2">3<span class="unit">대</span></div></div></div>
+      <div class="stat-card"><div class="icon-circle" style="background:#e0e7ff;color:#6366f1">📍</div><div><label>순찰 거리</label><div class="val" style="color:#4f46e5">28.5<span class="unit">km</span></div></div></div>
+      <div class="stat-card"><div class="icon-circle" style="background:#fee2e2;color:#dc2626">⚠</div><div><label>이상 탐지</label><div class="val" style="color:#dc2626">7<span class="unit">건</span></div></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="eyebrow">공공데이터 기반</div><h3>영천시 빈집 분포</h3>
+        <div class="map-area">
+          <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 600 340">
+            <line x1="150" y1="130" x2="280" y2="180" stroke="rgba(34,211,238,.25)" stroke-width="1"/>
+            <line x1="280" y1="180" x2="380" y2="115" stroke="rgba(34,211,238,.25)" stroke-width="1"/>
+            <line x1="380" y1="115" x2="450" y2="225" stroke="rgba(34,211,238,.25)" stroke-width="1"/>
+            <line x1="280" y1="180" x2="210" y2="240" stroke="rgba(34,211,238,.25)" stroke-width="1"/>
+            <circle cx="150" cy="130" r="8" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+            <circle cx="280" cy="180" r="7" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+            <circle cx="380" cy="115" r="6" fill="#22d3ee" stroke="#fff" stroke-width="2"/>
+            <circle cx="450" cy="225" r="7" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+            <circle cx="210" cy="240" r="6" fill="#22c55e" stroke="#fff" stroke-width="2"/>
+          </svg>
+          <div class="map-label"><p>STAR CITY YEONGCHEON</p><h4>영천시 빈집 분포</h4></div>
+          <div class="legend">
+            <span>● 위험</span><span>● 주의</span><span>● 관심</span><span>● 정비완료</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;gap:16px">
+        <div class="card">
+          <div class="eyebrow">자율주행 방범</div><h3>로봇 상태</h3>
+          <div style="text-align:center">
+            <div class="battery-ring"><svg viewBox="0 0 80 80" width="80" height="80"><circle cx="40" cy="40" r="34" stroke="#e2e8f0"/><circle cx="40" cy="40" r="34" stroke="#22c55e" stroke-dasharray="167" stroke-dashoffset="37" stroke-linecap="round"/></svg></div>
+            <div style="font-size:22px;font-weight:900;color:#16a34a">78%</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px">배터리</div>
+          </div>
+          <div style="margin-top:14px">
+            <div class="info-row"><span class="k">로봇 ID</span><span class="v">YC-ROBOT-01</span></div>
+            <div class="info-row"><span class="k">상태</span><span class="v"><span class="badge badge-green">운행 중</span></span></div>
+            <div class="info-row"><span class="k">현재 위치</span><span class="v">완산동 123-4</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="eyebrow" style="color:#dc2626">담당자 확인 필요</div><h3>실종자 후보 알림</h3>
+          <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:14px;padding:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-weight:800;color:#dc2626">실종자 후보 발견</span>
+              <span class="badge badge-red">긴급</span>
+            </div>
+            <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div><span style="font-size:10px;color:#64748b">유사도</span><div style="font-size:18px;font-weight:900;color:#dc2626">82%</div></div>
+              <div><span style="font-size:10px;color:#64748b">위치</span><div style="font-size:13px;font-weight:700;color:#1e293b">완산동 123-4</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">관제 이벤트 로그</div><h3>최근 알림</h3>
+      <div class="alert-list" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="alert-item"><div class="alert-dot" style="background:#ef4444"></div><div><h4>실종자 후보 발견</h4><p>완산동 123-4 · 14:30</p></div></div>
+        <div class="alert-item"><div class="alert-dot" style="background:#f59e0b"></div><div><h4>빈집 이상 징후 탐지</h4><p>도림동 456-7 · 13:20</p></div></div>
+        <div class="alert-item"><div class="alert-dot" style="background:#06b6d4"></div><div><h4>로봇 배터리 점검</h4><p>금호읍 순찰 구간 · 12:45</p></div></div>
+        <div class="alert-item"><div class="alert-dot" style="background:#22c55e"></div><div><h4>완산동 순찰 완료</h4><p>완산동 2구역 · 11:40</p></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+
+<script>
+function show(id){
+  document.querySelectorAll('.concept').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.switcher button').forEach(el=>el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+function tick(){
+  const t=new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date());
+  ['clock-a','clock-b','clock-c'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t});
+}
+tick();setInterval(tick,1000);
+</script>
+</body>
+</html>

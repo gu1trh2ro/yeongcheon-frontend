@@ -43,8 +43,9 @@ Build a polished hackathon MVP dashboard that immediately communicates:
 5. 재건축 용도 추천
 6. 실종자 후보 알림
 7. 공공데이터 기반 의사결정
+8. 별의 도시 영천 지역 정체성
 
-The dashboard should look like a real public-sector smart city control center, not a generic toy demo.
+The dashboard should look like a real public-sector smart city service, not a generic admin dashboard.
 
 ---
 
@@ -138,15 +139,15 @@ For every task, define success criteria.
 
 Example task:
 
-“Create initial dashboard layout”
+“Create or redesign initial dashboard layout”
 
 Success criteria:
 
 - `npm run dev` works.
 - `npm run build` passes.
 - Dashboard page renders without runtime error.
-- Placeholder sections are visible.
-- No real API, Naver Map, or WebSocket is implemented yet.
+- Tab switching works if tabs are requested.
+- No real API, Naver Map, or WebSocket is implemented unless explicitly requested.
 
 After changes, report:
 
@@ -319,44 +320,141 @@ It must not imply final identification or automatic reporting.
 
 ---
 
+## Visual Design Direction
+
+The user does not want a fully dark dashboard.
+
+The UI should be inspired by Yeongcheon City's official website style:
+
+- Bright regional identity
+- Star City Yeongcheon concept
+- Soft sky or celestial background
+- Large hero-style visual area
+- Smooth background changes by tab
+- Public-service dashboard cards over the background
+
+The final UI should feel like:
+
+```text
+Star City Yeongcheon Smart Safety Dashboard
+별의 도시 영천 스마트 안전 대시보드
+```
+
+It should combine:
+
+1. Yeongcheon local identity
+2. Public safety dashboard
+3. Smart city technology
+4. AI/robot monitoring service
+5. Public-data-based decision support
+
+Preferred visual style:
+
+- Bright sky-blue, soft mint, ivory, light navy, and white backgrounds
+- Soft gold/yellow highlights for star identity
+- Blue/cyan accents for robot and AI status
+- Red only for urgent alerts
+- Amber for caution
+- Green for normal/completed
+- Glassmorphism-style cards with translucent white backgrounds
+- Rounded 2xl cards
+- Soft shadows
+- Clear information hierarchy
+- Tab-specific background themes
+
+Avoid:
+
+- Fully dark admin dashboard
+- Plain white admin dashboard
+- Tourism-only landing page
+- Overuse of star icons
+- Toy-like UI
+- Too many cards on one screen
+- Low contrast text on images
+- Background images that make data hard to read
+- Excessive decorative effects that hide dashboard data
+
+The UI should be visually polished for a competition, but dashboard data must remain readable.
+
+---
+
 ## Local Identity Design Rule
 
 Yeongcheon is known as the “city of stars”.
 
 Reflect this local identity subtly in the UI.
 
-The dashboard should feel like:
-
-```text
-Star City Yeongcheon Smart Safety Dashboard
-별의 도시 영천 스마트 안전 관제 대시보드
-```
-
-not a tourism landing page.
-
 Good examples:
 
 - Small star symbol near the header/title
-- Very subtle constellation pattern in the background
+- Soft sky, star, orbit, or route-line motif
+- Very subtle constellation pattern in hero background
 - Route or connection lines that feel slightly constellation-inspired
-- Soft gold/yellow highlight for key points
-- Dark navy night-sky style background
-- Cyan/blue accents for AI and robot status
-- Small star-shaped point for a selected patrol node or key location
+- Soft gold/yellow highlight for selected key points
+- Blue/cyan accents for AI and robot status
+- Star-shaped point for a selected patrol node or key location
 
 Avoid:
 
 - Cute or playful star graphics
 - Too many star icons
-- Tourism-poster style design
-- Bright pastel full-screen theme
-- Overuse of yellow
+- Tourism-poster-only design
+- Bright full-screen yellow
 - Unprofessional decorative effects
-- Large decorative graphics that distract from dashboard data
+- Large decorations that distract from dashboard data
 
-The final UI must still look like a smart city control center and public safety monitoring dashboard.
+The final UI should feel like a public smart safety platform with Yeongcheon identity.
 
-The star motif must support the product identity, not overpower the dashboard.
+It should not feel like a pure tourism page.
+
+---
+
+## Tab-Based Background Theme Rule
+
+The dashboard should use tabs to reduce visual complexity.
+
+Main tabs:
+
+- 통합 대시보드
+- 빈집 관리
+- 로봇 관제
+- AI 분석/추천
+- 실종자 알림
+
+Each tab can have a different background theme.
+
+Recommended themes:
+
+1. 통합 대시보드
+   - Bright sky-blue / mint / ivory
+   - Star City Yeongcheon identity
+   - Overall city safety overview
+
+2. 빈집 관리
+   - Soft beige / light blue
+   - Urban regeneration and public-data feeling
+   - Map and risk markers
+
+3. 로봇 관제
+   - Clean blue / cyan
+   - Robot, route, patrol, live monitoring
+
+4. AI 분석/추천
+   - Soft purple / blue gradient
+   - AI analysis, recommendation, reconstruction planning
+
+5. 실종자 알림
+   - Light red / ivory background
+   - Safety alert, human review, report draft
+
+Implementation guidance:
+
+- Use React state for tabs.
+- Do not add React Router yet.
+- Do not add animation libraries.
+- Use CSS/Tailwind transitions for smooth background changes.
+- Keep the content readable with translucent cards.
+- Do not put all tab content in `App.tsx`.
 
 ---
 
@@ -366,17 +464,17 @@ This dashboard is for a competition, so the first screen must look polished.
 
 Design concept:
 
-- Smart city control center
-- Public safety monitoring dashboard
+- Bright public-service dashboard
+- Yeongcheon local brand identity
+- Star City Smart Safety Platform
 - AI-powered local government operations dashboard
-- Star City Yeongcheon identity
 - Autonomous patrol robot control dashboard
 
 Visual style:
 
-- Dark navy/slate background
-- Subtle night-sky or constellation background
-- 12-column dashboard grid
+- Bright sky-blue/mint/ivory background for the main overview
+- Tab-specific background themes
+- Glassmorphism cards
 - Rounded 2xl cards
 - Subtle borders
 - Soft shadows
@@ -391,7 +489,8 @@ Visual style:
 
 Avoid:
 
-- Plain white background
+- Fully dark page
+- Plain white admin dashboard
 - Random bright colors
 - Toy-like UI
 - Too much empty space
@@ -494,8 +593,6 @@ Do not put the entire UI in `App.tsx`.
 
 ## Dashboard Requirements
 
-The dashboard should look like a dark public-safety control center.
-
 Main title:
 
 ```text
@@ -511,12 +608,12 @@ Star City Smart Safety Platform
 Main sections:
 
 - 상단 Header
-- 실시간 자율주행 방범 현황
+- 탭 메뉴
+- 통합 대시보드
+- 영천시 빈집 분포 및 현황
 - 로봇 영상 또는 이미지 placeholder
 - 로봇 상태
 - 자율주행 순찰 경로
-- 영천시 빈집 분포 및 현황
-- 빈집 지도 placeholder
 - 빈집 정비 우선순위
 - 추천 재건축 요소
 - 실종자 후보 알림
@@ -525,7 +622,7 @@ Main sections:
 
 Use Korean labels.
 
-Use professional dashboard language.
+Use professional public-service dashboard language.
 
 Avoid vague placeholder labels like:
 
@@ -542,35 +639,42 @@ Use realistic Korean labels related to the project.
 
 Use a desktop-first dashboard layout.
 
-Recommended layout:
+The UI should not force all information onto one screen.
+
+Use tabs to separate detail views.
+
+Recommended top-level layout:
 
 ```text
 Header
-└─ service title, navigation tabs, current time, operation status
+└─ service title, subtitle, current time, operation status
 
-Main dashboard grid
-├─ Left column
-│  ├─ Robot camera/image panel
-│  ├─ Robot status panel
-│  └─ Patrol route panel
-│
-├─ Center column
-│  ├─ Yeongcheon vacant-house map placeholder
-│  ├─ Maintenance priority table
-│  └─ Reconstruction recommendation
-│
-└─ Right column
-   ├─ Missing-person candidate alert
-   ├─ AI analysis result
-   └─ Recent alerts
+Tab menu
+├─ 통합 대시보드
+├─ 빈집 관리
+├─ 로봇 관제
+├─ AI 분석/추천
+└─ 실종자 알림
 
-Bottom summary cards
-├─ Total vacant houses
-├─ Maintenance completion rate
-├─ Active robots
-├─ Patrol distance
-└─ Today anomaly count
+Active tab content
+└─ tab-specific dashboard cards and hero area
 ```
+
+Default selected tab:
+
+```text
+통합 대시보드
+```
+
+The overview tab should show only the most important information:
+
+- Big vacant-house map placeholder
+- Robot status summary
+- Missing-person candidate alert summary
+- AI anomaly summary
+- Bottom summary cards
+
+Move detailed tables and long explanations into relevant detail tabs.
 
 Desktop demo quality is more important than perfect mobile responsiveness.
 
@@ -587,19 +691,34 @@ Show:
 - Star-inspired logo or small star symbol
 - Project title: 영천시 빈집 관리 및 자율주행 방범 대시보드
 - Subtitle: Star City Smart Safety Platform
-- Navigation tabs:
-  - 통합 대시보드
-  - 빈집 관리
-  - 자율주행 방범
-  - 재건축 추천
-  - 실종자 알림
-  - 통계/분석
 - Current date/time
 - Operation status badge, such as:
   - 관제 운영 중
   - AI 분석 활성화
 
 The star motif should be subtle and professional.
+
+---
+
+### Tab Menu
+
+Show these tabs:
+
+- 통합 대시보드
+- 빈집 관리
+- 로봇 관제
+- AI 분석/추천
+- 실종자 알림
+
+Use React state for active tab.
+
+Do not use React Router yet.
+
+When tab changes:
+
+- Active content changes.
+- Background theme changes.
+- The page should feel visually different but consistent.
 
 ---
 
@@ -625,7 +744,7 @@ Show:
 - Small status badge: 실시간 영상
 - Robot ID
 - Current patrol status
-- Optional scanning overlay or subtle grid effect
+- Optional scanning overlay or subtle route/grid effect
 
 Do not implement real video streaming yet.
 
@@ -657,7 +776,7 @@ Initial implementation:
 - Make it look like a real map panel.
 - Include Yeongcheon label.
 - Include risk markers.
-- Include subtle constellation-inspired route/connection line if suitable.
+- Include subtle star/route/connection line if suitable.
 - Include legend:
   - 위험
   - 주의
@@ -735,7 +854,7 @@ Use wording such as:
 
 Show:
 
-- Red alert card
+- Alert card
 - Detection time
 - Location
 - Similarity score
@@ -748,6 +867,8 @@ Show:
 Do not show real personal data.
 
 Do not use unsafe wording.
+
+Urgent alert can use red accents, but the full page does not need to be dark.
 
 ---
 
@@ -845,46 +966,19 @@ Follow this order unless the user explicitly changes it:
 2. Mock data
 3. Common components
 4. Dashboard layout
-5. Dashboard cards
-6. Placeholder map
-7. API adapter with mock Promise functions
-8. Naver Maps integration
-9. Real backend API integration
-10. Polling
-11. UI polish
-12. Deployment preparation
+5. Tab-based layout
+6. Dashboard cards
+7. Placeholder map
+8. API adapter with mock Promise functions
+9. Naver Maps integration
+10. Real backend API integration
+11. Polling
+12. UI polish
+13. Deployment preparation
 
 Do not skip ahead.
 
-Do not implement Naver Maps, real API, or WebSocket during the initial UI layout task.
-
----
-
-## First Task Scope
-
-For the first implementation task, only do:
-
-1. `src/types/dashboard.ts`
-2. `src/data/mockData.ts`
-3. `src/components/common/Card.tsx`
-4. `src/components/common/Badge.tsx`
-5. `src/components/common/ProgressBar.tsx`
-6. `src/components/layout/Header.tsx`
-7. `src/pages/DashboardPage.tsx`
-8. Update `App.tsx` to render `DashboardPage`
-
-Do not implement:
-
-- Real backend API
-- Naver Maps
-- WebSocket
-- Authentication
-- Deployment
-- Public-data API calls
-
-For the first implementation, it is acceptable to create placeholder versions of dashboard components inside `DashboardPage.tsx` or as small separate components if that keeps the code clean.
-
-Avoid a huge single-file implementation.
+Do not implement Naver Maps, real API, or WebSocket during the initial UI layout or redesign task.
 
 ---
 
@@ -926,13 +1020,17 @@ Stable demo is more important than perfect real-time streaming.
 
 Use Tailwind CSS.
 
-Prefer:
+For the new bright theme, prefer:
 
-- `bg-slate-950`
-- `bg-slate-900`
-- `border-slate-800`
-- `text-slate-100`
-- `text-slate-300`
+- `bg-sky-50`
+- `bg-cyan-50`
+- `bg-blue-50`
+- `bg-amber-50`
+- `bg-white/70`
+- `backdrop-blur`
+- `border-white/60`
+- `text-slate-900`
+- `text-slate-600`
 - `rounded-2xl`
 - `shadow`
 - `grid`
@@ -941,15 +1039,15 @@ Prefer:
 
 Use controlled accent colors:
 
-- Cyan/blue for AI and robot status
+- Sky/blue/cyan for AI and robot status
 - Red for danger/urgent alert
-- Amber/yellow for caution
+- Amber/yellow/gold for caution and star identity
 - Green for normal/completed
-- Soft gold for star identity and selected key points
+- Purple/blue for AI recommendation tab
 
 Do not use many unrelated colors.
 
-Do not use bright full-page yellow or pastel tourism colors.
+Do not make the full page dark unless a specific tab intentionally needs a darker accent.
 
 ---
 
@@ -968,6 +1066,8 @@ Buttons should look clickable.
 Use semantic HTML when reasonable.
 
 Do not rely only on color if a label can clarify the meaning.
+
+Background decoration must not reduce readability.
 
 ---
 
@@ -1053,8 +1153,8 @@ Do not:
 - Add WebSocket before requested.
 - Expose secret keys.
 - Use unsafe missing-person wording.
-- Create a tourism-style landing page.
-- Use a plain white admin dashboard.
+- Create a pure tourism landing page.
+- Use a fully dark admin dashboard if the user requested bright Yeongcheon branding.
 - Put all code in `App.tsx`.
 - Add unnecessary libraries.
 - Ignore build errors.
