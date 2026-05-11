@@ -17,20 +17,18 @@ export default function Card({
 }: CardProps) {
   return (
     <section
-      className={`rounded-2xl border border-slate-800/80 bg-slate-900/75 p-4 shadow-xl shadow-slate-950/30 backdrop-blur ${className}`}
+      className={`rounded-3xl bg-white/95 p-6 border-[3px] border-amber-50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] backdrop-blur-sm ${className}`}
     >
       {(title || eyebrow || action) && (
-        <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="mb-5 flex items-start justify-between gap-3 border-b-2 border-slate-100 pb-4">
           <div>
             {eyebrow && (
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-300/80">
+              <p className="text-[13px] font-black text-sky-500 mb-1">
                 {eyebrow}
               </p>
             )}
             {title && (
-              <h2 className="mt-1 text-base font-semibold text-slate-100">
-                {title}
-              </h2>
+              <h2 className="text-[19px] font-black text-slate-700 tracking-tight">{title}</h2>
             )}
           </div>
           {action}

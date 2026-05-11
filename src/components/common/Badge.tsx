@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-type BadgeTone = 'cyan' | 'red' | 'amber' | 'green' | 'slate' | 'gold';
+type BadgeTone = 'sky' | 'red' | 'amber' | 'green' | 'gray' | 'star';
 
 interface BadgeProps {
   children: ReactNode;
@@ -9,22 +9,22 @@ interface BadgeProps {
 }
 
 const toneClasses: Record<BadgeTone, string> = {
-  cyan: 'border-cyan-400/40 bg-cyan-400/10 text-cyan-200',
-  red: 'border-red-400/40 bg-red-500/15 text-red-200',
-  amber: 'border-amber-300/40 bg-amber-400/10 text-amber-200',
-  green: 'border-emerald-400/40 bg-emerald-400/10 text-emerald-200',
-  slate: 'border-slate-600/70 bg-slate-800/80 text-slate-200',
-  gold: 'border-yellow-300/40 bg-yellow-300/10 text-yellow-100',
+  sky: 'bg-sky-light text-sky-dark',
+  red: 'bg-red-50 text-red-600',
+  amber: 'bg-amber-50 text-amber-600',
+  green: 'bg-emerald-50 text-emerald-600',
+  gray: 'bg-gray-100 text-gray-500',
+  star: 'bg-star-light text-amber-700',
 };
 
 export default function Badge({
   children,
-  tone = 'slate',
+  tone = 'gray',
   className = '',
 }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${toneClasses[tone]} ${className}`}
+      className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold ${toneClasses[tone]} ${className}`}
     >
       {children}
     </span>
