@@ -14,29 +14,9 @@
 {
   "vacantHouseCount": 147,
   "maintenanceRate": 32,
-  "activeRobotCount": 3,
-  "todayPatrolDistance": 28.5,
-  "todayAnomalyCount": 7
-}
-```
-
----
-
-## GET /api/robots/{robotId}
-
-특정 자율주행 로봇의 현재 상태를 반환한다.
-
-### Response
-
-```json
-{
-  "robotId": "ROBOT-01",
-  "battery": 78,
-  "status": "운행 중",
-  "currentLocation": "영천시 완산동 123-4",
-  "nextDestination": "완산동 125-6",
-  "latestImageUrl": "/images/robot-latest.jpg",
-  "lastUpdatedAt": "2026-05-10T14:30:00"
+  "highRiskHouseCount": 23,
+  "todayAnomalyCount": 7,
+  "missingPersonCandidateCount": 1
 }
 ```
 
@@ -55,6 +35,13 @@
     "address": "영천시 완산동 123-4",
     "lat": 35.9736,
     "lng": 128.9387,
+    "parcelCode": {
+      "sigunguCd": "47230",
+      "bjdongCd": "10100",
+      "platGbCd": "0",
+      "bun": "0123",
+      "ji": "0004"
+    },
     "riskLevel": "위험",
     "priorityRank": 1,
     "oldness": 92,
@@ -67,6 +54,13 @@
     "address": "영천시 도림동 456-7",
     "lat": 35.9688,
     "lng": 128.9301,
+    "parcelCode": {
+      "sigunguCd": "47230",
+      "bjdongCd": "10900",
+      "platGbCd": "0",
+      "bun": "0456",
+      "ji": "0007"
+    },
     "riskLevel": "주의",
     "priorityRank": 2,
     "oldness": 81,
@@ -170,17 +164,104 @@
 
 ---
 
+## GET /api/graph
+
+순찰 경로 표시를 위한 도로 그래프와 빈집 좌표를 반환한다.
+
+현재 프론트는 이 API 호출에 실패하면 mock 순찰 경로를 표시한다.
+
+### Response
+
+```json
+{
+  "type": "graph",
+  "nodes": {
+    "N0": [8.9, 8.5],
+    "N1": [8.3, 8.2]
+  },
+  "edges": {
+    "N0": ["N1"],
+    "N1": ["N0"]
+  },
+  "houses": {
+    "H1": {
+      "pos": [8.65, -0.42],
+      "yaw": -1.184
+    },
+    "H2": {
+      "pos": [-3.73, -8.54],
+      "yaw": -0.847
+    }
+  }
+}
+```
+
+---
+
+## GET /api/arrival/{houseId}
+
+특정 빈집의 로봇 촬영 이력을 반환한다.
+
+현재 백엔드 문서 호환을 위해 프론트는 `/api/arrival/{houseId}`를 먼저 시도하고, 실패하면 `/arrival/{houseId}`도 시도한다. 두 요청이 모두 실패하면 mock 촬영 이력을 표시한다.
+
+### Response
+
+```json
+[
+  {
+    "id": "ARR-001",
+    "timestamp": "2026-05-10T14:31:20",
+    "photo": "/uploads/robots/robot-01/images/H-001.jpg",
+    "x": "8.65",
+    "y": "-0.42",
+    "analysis_result": "이상징후",
+    "analysis_summary": "외벽 균열 가능성이 감지되었습니다."
+  }
+]
+```
+
+---
+
 ## POST /api/maintenance/analyze
 
 특정 빈집에 대해 AI Agent 기반 재건축 추천 결과를 반환한다.
+
+프론트는 사용자가 선택한 빈집의 주소, 좌표, 지번 코드를 함께 전송한다.
+백엔드는 이 정보를 기준으로 AI Agent 분석을 실행하고, 결과를 DB에 저장한 뒤 추천 결과를 반환한다.
 
 ### Request
 
 ```json
 {
-  "houseId": "H-001"
+  "houseId": "H-001",
+  "address": "영천시 완산동 123-4",
+  "coordinate": {
+    "lat": 35.9736,
+    "lng": 128.9387
+  },
+  "parcelCode": {
+    "sigunguCd": "47230",
+    "bjdongCd": "10100",
+    "platGbCd": "0",
+    "bun": "0123",
+    "ji": "0004"
+  }
 }
 ```
+
+### Request Fields
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `houseId` | string | 필 | 프론트/백엔드에서 사용하는 빈집 식별자 |
+| `address` | string | 필 | 사용자가 선택한 빈집 주소 또는 지번 표시명 |
+| `coordinate.lat` | number | 필 | 빈집 위도 |
+| `coordinate.lng` | number | 필 | 빈집 경도 |
+| `parcelCode.sigunguCd` | string | 필 | 시군구코드 |
+| `parcelCode.bjdongCd` | string | 필 | 법정동코드 |
+| `parcelCode.platGbCd` | string | 필 | 대지구분코드. `0`: 대지, `1`: 산, `2`: 블록 |
+| `parcelCode.bun` | string | 필 | 본번. 4자리 문자열 권장 |
+| `parcelCode.ji` | string | 필 | 부번. 4자리 문자열 권장 |
 
 ### Response
 
@@ -218,7 +299,6 @@
 ```text
 MISSING_PERSON_CANDIDATE
 VACANT_HOUSE_ANOMALY
-ROBOT_STATUS
 PATROL_COMPLETE
 MAINTENANCE_RECOMMENDATION
 ```
@@ -242,6 +322,28 @@ HIGH
 MEDIUM
 LOW
 ```
+
+### parcelCode
+
+빈집 재건축 추천 요청에는 건축물대장/공공데이터 조회에 필요한 지번 코드를 함께 보낸다.
+
+```json
+{
+  "sigunguCd": "47230",
+  "bjdongCd": "10100",
+  "platGbCd": "0",
+  "bun": "0123",
+  "ji": "0004"
+}
+```
+
+| 필드 | 설명 | 예시 |
+|------|------|------|
+| `sigunguCd` | 시군구코드 | `"47230"` |
+| `bjdongCd` | 법정동코드 | `"10100"` |
+| `platGbCd` | 대지구분코드. `0`: 대지, `1`: 산, `2`: 블록 | `"0"` |
+| `bun` | 본번 | `"0123"` |
+| `ji` | 부번 | `"0004"` |
 
 ---
 

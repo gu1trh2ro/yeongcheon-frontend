@@ -1,30 +1,23 @@
 import type {
   DashboardSummary,
-  MaintenancePriority,
   MissingPersonAlert,
+  MissingPersonDetectionLog,
+  MissingPersonPublicProfile,
+  PatrolArrivalPhoto,
+  PatrolRoute,
   RecentEvent,
   ReconstructionRecommendation,
-  RobotStatus,
+  RobotActivityLog,
+  RobotMissionTarget,
   VacantHouse,
 } from '../types/dashboard';
 
 export const dashboardSummary: DashboardSummary = {
   vacantHouseCount: 147,
   maintenanceRate: 32,
-  activeRobotCount: 3,
-  todayPatrolDistance: 28.5,
+  highRiskHouseCount: 23,
   todayAnomalyCount: 7,
-};
-
-export const robotStatus: RobotStatus = {
-  robotId: 'YC-ROBOT-01',
-  battery: 78,
-  status: '운행 중',
-  currentLocation: '영천시 완산동 123-4 인근',
-  nextDestination: '완산동 125-6 위험 빈집',
-  connectionStatus: '연결 안정',
-  latestImageUrl: undefined,
-  lastUpdatedAt: '2026-05-10T14:30:00',
+  missingPersonCandidateCount: 1,
 };
 
 export const vacantHouses: VacantHouse[] = [
@@ -33,6 +26,13 @@ export const vacantHouses: VacantHouse[] = [
     address: '영천시 완산동 123-4',
     lat: 35.9736,
     lng: 128.9387,
+    parcelCode: {
+      sigunguCd: '47230',
+      bjdongCd: '10100',
+      platGbCd: '0',
+      bun: '0123',
+      ji: '0004',
+    },
     riskLevel: '위험',
     priorityRank: 1,
     oldness: 92,
@@ -45,6 +45,13 @@ export const vacantHouses: VacantHouse[] = [
     address: '영천시 도림동 456-7',
     lat: 35.9688,
     lng: 128.9301,
+    parcelCode: {
+      sigunguCd: '47230',
+      bjdongCd: '10900',
+      platGbCd: '0',
+      bun: '0456',
+      ji: '0007',
+    },
     riskLevel: '주의',
     priorityRank: 2,
     oldness: 81,
@@ -57,6 +64,13 @@ export const vacantHouses: VacantHouse[] = [
     address: '영천시 금호읍 789-1',
     lat: 35.9332,
     lng: 128.8796,
+    parcelCode: {
+      sigunguCd: '47230',
+      bjdongCd: '25000',
+      platGbCd: '0',
+      bun: '0789',
+      ji: '0001',
+    },
     riskLevel: '관심',
     priorityRank: 3,
     oldness: 67,
@@ -69,6 +83,13 @@ export const vacantHouses: VacantHouse[] = [
     address: '영천시 중앙동 234-5',
     lat: 35.9634,
     lng: 128.9362,
+    parcelCode: {
+      sigunguCd: '47230',
+      bjdongCd: '10500',
+      platGbCd: '0',
+      bun: '0234',
+      ji: '0005',
+    },
     riskLevel: '정비완료',
     priorityRank: 8,
     oldness: 34,
@@ -81,6 +102,13 @@ export const vacantHouses: VacantHouse[] = [
     address: '영천시 화북면 567-8',
     lat: 36.1052,
     lng: 128.9151,
+    parcelCode: {
+      sigunguCd: '47230',
+      bjdongCd: '33000',
+      platGbCd: '0',
+      bun: '0567',
+      ji: '0008',
+    },
     riskLevel: '주의',
     priorityRank: 4,
     oldness: 79,
@@ -90,23 +118,133 @@ export const vacantHouses: VacantHouse[] = [
   },
 ];
 
-export const maintenancePriorities: MaintenancePriority[] = vacantHouses
-  .filter((house) => house.riskLevel !== '정비완료')
-  .map((house) => ({
-    rank: house.priorityRank,
-    houseId: house.houseId,
-    address: house.address,
-    riskLevel: house.riskLevel,
-    oldness: house.oldness,
-    accessibility: house.accessibility,
-    populationDensity: house.populationDensity,
-    totalScore: house.totalScore,
-    reason:
-      house.riskLevel === '위험'
-        ? '노후도와 인구 밀집 영향이 높아 우선 현장 확인이 필요합니다.'
-        : '접근성과 주변 생활권 데이터를 함께 고려한 정비 후보지입니다.',
-  }))
-  .sort((a, b) => a.rank - b.rank);
+export const patrolRoute: PatrolRoute = {
+  missionId: 'MISSION-20260510-001',
+  routeName: '완산동 위험 빈집 촬영 경로',
+  generatedAt: '2026-05-10T14:20:00',
+  completedHouseCount: 2,
+  totalHouseCount: 5,
+  points: [
+    {
+      pointId: 'P-START',
+      label: '출발 지점',
+      viewX: 55,
+      viewY: 180,
+      visitOrder: 0,
+      isArrivalPoint: false,
+      isCompleted: true,
+    },
+    {
+      pointId: 'P-H001',
+      label: '완산동 123-4',
+      houseId: 'H-001',
+      viewX: 150,
+      viewY: 132,
+      visitOrder: 1,
+      isArrivalPoint: true,
+      isCompleted: true,
+    },
+    {
+      pointId: 'P-H002',
+      label: '도림동 456-7',
+      houseId: 'H-002',
+      viewX: 245,
+      viewY: 96,
+      visitOrder: 2,
+      isArrivalPoint: true,
+      isCompleted: true,
+    },
+    {
+      pointId: 'P-H003',
+      label: '금호읍 789-1',
+      houseId: 'H-003',
+      viewX: 345,
+      viewY: 62,
+      visitOrder: 3,
+      isArrivalPoint: true,
+      isCompleted: false,
+    },
+    {
+      pointId: 'P-H005',
+      label: '화북면 567-8',
+      houseId: 'H-005',
+      viewX: 432,
+      viewY: 108,
+      visitOrder: 4,
+      isArrivalPoint: true,
+      isCompleted: false,
+    },
+  ],
+};
+
+export const robotMissionTargets: RobotMissionTarget[] = [
+  { targetId: 'H1', label: 'H1', address: '완산동 123-4', viewX: 78, viewY: 204 },
+  { targetId: 'H2', label: 'H2', address: '도림동 456-7', viewX: 178, viewY: 150 },
+  { targetId: 'H3', label: 'H3', address: '금호읍 789-1', viewX: 292, viewY: 96 },
+  { targetId: 'H4', label: 'H4', address: '중앙동 234-5', viewX: 386, viewY: 130 },
+  { targetId: 'H5', label: 'H5', address: '화북면 567-8', viewX: 438, viewY: 202 },
+  { targetId: 'H6', label: 'H6', address: '서부동 152-8', viewX: 246, viewY: 226 },
+];
+
+export const robotActivityLogs: RobotActivityLog[] = [
+  {
+    logId: 'LOG-001',
+    timestamp: '2026-05-10T14:47:49',
+    message: '로봇 관제 화면이 모의 데이터로 초기화되었습니다.',
+    tone: 'info',
+  },
+  {
+    logId: 'LOG-002',
+    timestamp: '2026-05-10T14:47:47',
+    message: 'H2 지점 도착 이벤트를 수신했습니다.',
+    tone: 'success',
+  },
+  {
+    logId: 'LOG-003',
+    timestamp: '2026-05-10T14:47:43',
+    message: 'H2 촬영 단계로 전환했습니다.',
+    tone: 'info',
+  },
+  {
+    logId: 'LOG-004',
+    timestamp: '2026-05-10T14:47:38',
+    message: '순찰 경로 대기 상태입니다.',
+    tone: 'warning',
+  },
+];
+
+export const patrolArrivalPhotos: PatrolArrivalPhoto[] = [
+  {
+    photoId: 'ARR-001',
+    houseId: 'H-001',
+    address: '영천시 완산동 123-4',
+    capturedAt: '2026-05-10T14:31:20',
+    odomX: 8.65,
+    odomY: -0.42,
+    analysisResult: '이상징후',
+    analysisSummary: '외벽 균열 가능성이 감지되어 담당자 확인 대상으로 분류했습니다.',
+  },
+  {
+    photoId: 'ARR-002',
+    houseId: 'H-002',
+    address: '영천시 도림동 456-7',
+    capturedAt: '2026-05-10T14:36:44',
+    odomX: -3.73,
+    odomY: -8.54,
+    analysisResult: '분석중',
+    analysisSummary: '촬영 이미지를 이상 탐지 분석 작업에 전달했습니다.',
+  },
+  {
+    photoId: 'ARR-003',
+    houseId: 'H-004',
+    address: '영천시 중앙동 234-5',
+    capturedAt: '2026-05-10T13:58:11',
+    odomX: 5.2,
+    odomY: 2.1,
+    analysisResult: '정상',
+    analysisSummary: '정비 완료 구역으로 추가 이상 징후는 확인되지 않았습니다.',
+  },
+];
 
 export const reconstructionRecommendation: ReconstructionRecommendation = {
   houseId: 'H-001',
@@ -129,6 +267,111 @@ export const missingPersonAlert: MissingPersonAlert = {
     'AI/YOLO 기반 탐지 결과 실종자 후보로 분류된 이벤트입니다. 담당자 확인 필요 상태이며 신고 초안 생성이 가능합니다.',
   status: '담당자 확인 필요',
 };
+
+export const missingPersonProfiles: MissingPersonPublicProfile[] = [
+  {
+    profileId: 'MP-001',
+    rnum: 5,
+    occrde: '20230717',
+    alldressingDscd: null,
+    ageNow: '89',
+    age: 86,
+    writngTrgetDscd: '070',
+    sexdstnDscd: '남자',
+    occrAdres: '경상북도 영천시 완산동',
+    nm: '황시모',
+    nltyDscd: '내국인',
+    height: 165,
+    bdwgh: 55,
+    frmDscd: '마름',
+    faceshpeDscd: '갸름한형',
+    hairshpeDscd: '짧은머리(생머리)',
+    haircolrDscd: '백색',
+  },
+  {
+    profileId: 'MP-002',
+    rnum: 8,
+    occrde: '20240109',
+    alldressingDscd: '검정 점퍼, 회색 바지',
+    ageNow: '72',
+    age: 70,
+    writngTrgetDscd: '070',
+    sexdstnDscd: '여자',
+    occrAdres: '경상북도 영천시 중앙동',
+    nm: '김영자',
+    nltyDscd: '내국인',
+    height: 154,
+    bdwgh: 48,
+    frmDscd: '보통',
+    faceshpeDscd: '둥근형',
+    hairshpeDscd: '짧은머리',
+    haircolrDscd: '흑색',
+  },
+  {
+    profileId: 'MP-003',
+    rnum: 12,
+    occrde: '20240522',
+    alldressingDscd: '남색 상의',
+    ageNow: '81',
+    age: 80,
+    writngTrgetDscd: '070',
+    sexdstnDscd: '남자',
+    occrAdres: '경상북도 영천시 금호읍',
+    nm: '박정수',
+    nltyDscd: '내국인',
+    height: 170,
+    bdwgh: 62,
+    frmDscd: '보통',
+    faceshpeDscd: '긴형',
+    hairshpeDscd: '짧은머리',
+    haircolrDscd: '백색',
+  },
+];
+
+export const missingPersonDetectionLogs: MissingPersonDetectionLog[] = [
+  {
+    logId: 'MLOG-001',
+    candidateName: '발견 후보 A',
+    candidateAgeLabel: '80대 추정',
+    candidateGender: '남자',
+    detectedAt: '2026-05-10T14:30:00',
+    location: '영천시 완산동 123-4 인근',
+    similarity: 82,
+    robotId: 'robot-01',
+    cameraLabel: '전방 카메라',
+    status: '담당자 확인 필요',
+    description: 'AI/YOLO 기반 탐지 결과 실종자 후보로 분류된 이벤트입니다. 담당자 확인 필요 상태이며 신고 초안 생성이 가능합니다.',
+    evidenceSummary: '보행자 객체, 연령대, 체형 특징이 로봇 탐지 기준과 일부 유사합니다.',
+  },
+  {
+    logId: 'MLOG-002',
+    candidateName: '발견 후보 B',
+    candidateAgeLabel: '70대 추정',
+    candidateGender: '여자',
+    detectedAt: '2026-05-10T13:12:00',
+    location: '영천시 중앙동 234-5 인근',
+    similarity: 67,
+    robotId: 'robot-01',
+    cameraLabel: '좌측 카메라',
+    status: '확인중',
+    description: '순찰 영상에서 후보 특징과 일부 유사한 인물이 탐지되어 담당자 검토 목록에 추가되었습니다.',
+    evidenceSummary: '의복 색상과 이동 방향은 유사하지만 얼굴 특징은 추가 확인이 필요합니다.',
+  },
+  {
+    logId: 'MLOG-003',
+    candidateName: '발견 후보 C',
+    candidateAgeLabel: '80대 추정',
+    candidateGender: '남자',
+    detectedAt: '2026-05-10T11:48:00',
+    location: '영천시 금호읍 789-1 주변',
+    similarity: 54,
+    robotId: 'robot-02',
+    cameraLabel: '전방 카메라',
+    status: '처리완료',
+    description: '낮은 유사도 후보로 분류되어 담당자 검토 후 일반 통행자로 처리했습니다.',
+    evidenceSummary: '신장 추정값과 보행 패턴이 후보 정보와 차이가 있어 처리 완료했습니다.',
+  },
+];
 
 export const recentEvents: RecentEvent[] = [
   {
@@ -153,13 +396,13 @@ export const recentEvents: RecentEvent[] = [
   },
   {
     eventId: 'E-003',
-    type: 'ROBOT_STATUS',
-    title: '자율주행 로봇 배터리 점검',
-    location: '금호읍 순찰 구간',
+    type: 'MAINTENANCE_RECOMMENDATION',
+    title: '정비 후보지 점수 재계산',
+    location: '금호읍 일대',
     detectedAt: '2026-05-10T12:45:00',
     status: '확인중',
     severity: 'LOW',
-    description: '배터리 30% 이하 도달 전 충전 경로를 확인했습니다.',
+    description: '공공데이터와 현장 위험도 기준으로 후보지 점수를 다시 계산했습니다.',
   },
   {
     eventId: 'E-004',
