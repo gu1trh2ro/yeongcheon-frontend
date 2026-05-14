@@ -468,9 +468,7 @@ export function getMissingPersonAlert(): Promise<MissingPersonAlert> {
 }
 
 export function getMissingPersonProfiles(): Promise<MissingPersonPublicProfile[]> {
-  return resolveMockData(
-    missingPersonProfiles.filter((profile) => profile.occrAdres.includes('영천')),
-  );
+  return resolveMockData(missingPersonProfiles);
 }
 
 export function getMissingPersonDetectionLogs(): Promise<MissingPersonDetectionLog[]> {

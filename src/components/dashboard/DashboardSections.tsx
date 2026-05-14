@@ -1067,6 +1067,22 @@ function formatPublicDataDate(value: string) {
   return `${value.slice(0, 4)}.${value.slice(4, 6)}.${value.slice(6, 8)}`;
 }
 
+type MissingPersonSortOrder = 'latest' | 'oldest';
+
+function getPublicDataDateValue(value: string) {
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function getMissingPersonCity(address: string) {
+  const tokens = address.split(/\s+/).filter(Boolean);
+  const cityOrCounty = tokens.find((token, index) => index > 0 && (token.endsWith('시') || token.endsWith('군')))
+    ?? tokens.find((token) => token.endsWith('시') || token.endsWith('군'));
+
+  return cityOrCounty ?? '지역 미분류';
+}
+
 function missingLogStatusClass(status: MissingPersonDetectionLog['status']) {
   if (status === '담당자 확인 필요') return 'bg-rose-100 text-rose-600';
   if (status === '확인중') return 'bg-amber-100 text-amber-700';
@@ -1277,41 +1293,117 @@ export function MissingPersonDetailCard({
 }) {
   const selectedLog = detectionLogs.find((log) => log.logId === selectedLogId) ?? null;
   const selectedProfile = missingPersonProfiles.find((profile) => profile.profileId === selectedProfileId) ?? null;
+  const [profileSearchQuery, setProfileSearchQuery] = useState('');
+  const [selectedProfileCity, setSelectedProfileCity] = useState('전체');
+  const [profileSortOrder, setProfileSortOrder] = useState<MissingPersonSortOrder>('latest');
+  const normalizedProfileSearchQuery = profileSearchQuery.trim().toLocaleLowerCase('ko-KR');
+  const cityOptions = Array.from(
+    new Set(missingPersonProfiles.map((profile) => getMissingPersonCity(profile.occrAdres))),
+  ).sort((a, b) => a.localeCompare(b, 'ko-KR'));
+  const filteredProfiles = missingPersonProfiles
+    .filter((profile) => {
+      if (!normalizedProfileSearchQuery) return true;
+
+      return profile.nm.toLocaleLowerCase('ko-KR').includes(normalizedProfileSearchQuery);
+    })
+    .filter((profile) => selectedProfileCity === '전체' || getMissingPersonCity(profile.occrAdres) === selectedProfileCity)
+    .sort((a, b) => {
+      const order = getPublicDataDateValue(b.occrde) - getPublicDataDateValue(a.occrde);
+      const sortedOrder = profileSortOrder === 'latest' ? order : -order;
+
+      return sortedOrder || a.rnum - b.rnum;
+    });
 
   return (
     <div className="grid gap-6">
       <div className="grid items-start gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <Card title="실종자 리스트" eyebrow="경찰청 실종경보 공공데이터 기반 · 영천시 필터">
-          <div className="grid gap-3">
-            {missingPersonProfiles.map((profile) => (
-              <button
-                key={profile.profileId}
-                type="button"
-                onClick={() => onSelectProfile(profile.profileId)}
-                className="grid w-full gap-4 rounded-3xl border-2 border-white bg-slate-50 p-4 text-left shadow-sm transition-colors hover:border-sky-100 hover:bg-white sm:grid-cols-[96px_1fr]"
+        <Card title="실종자 리스트" eyebrow="경찰청 실종경보 공공데이터 기반 · 경북 시군 필터">
+          <div className="mb-4 grid gap-3 rounded-3xl bg-slate-50/80 p-4 md:grid-cols-2 2xl:grid-cols-3">
+            <label className="grid min-w-0 gap-2">
+              <span className="text-[12px] font-black text-slate-500">이름 검색</span>
+              <input
+                type="search"
+                value={profileSearchQuery}
+                onChange={(event) => setProfileSearchQuery(event.target.value)}
+                placeholder="이름을 입력하세요"
+                className="h-11 w-full min-w-0 rounded-2xl border-2 border-white bg-white px-4 text-[13px] font-bold text-slate-700 shadow-sm outline-none transition-colors placeholder:text-slate-300 focus:border-sky-200"
+              />
+            </label>
+
+            <label className="grid min-w-0 gap-2">
+              <span className="text-[12px] font-black text-slate-500">시/군 선택</span>
+              <select
+                value={selectedProfileCity}
+                onChange={(event) => setSelectedProfileCity(event.target.value)}
+                className="h-11 w-full min-w-0 rounded-2xl border-2 border-white bg-white px-4 text-[13px] font-bold text-slate-700 shadow-sm outline-none transition-colors focus:border-sky-200"
               >
-                <MissingPersonPhotoSlot photoUrl={profile.photoUrl} />
-                <div className="min-w-0">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-[15px] font-black text-slate-700">{profile.nm}</p>
-                      <p className="mt-1 text-[12px] font-bold text-slate-400">
-                        {profile.sexdstnDscd} · 현재 {profile.ageNow}세 · {profile.nltyDscd}
-                      </p>
+                <option value="전체">경북 전체</option>
+                {cityOptions.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="grid min-w-0 gap-2">
+              <span className="text-[12px] font-black text-slate-500">발생일 정렬</span>
+              <select
+                value={profileSortOrder}
+                onChange={(event) => setProfileSortOrder(event.target.value as MissingPersonSortOrder)}
+                className="h-11 w-full min-w-0 rounded-2xl border-2 border-white bg-white px-4 text-[13px] font-bold text-slate-700 shadow-sm outline-none transition-colors focus:border-sky-200"
+              >
+                <option value="latest">최신순</option>
+                <option value="oldest">오래된순</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[12px] font-black text-slate-400">
+              검색 결과 {filteredProfiles.length}명
+            </p>
+            <p className="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-black text-sky-600">
+              {selectedProfileCity === '전체' ? '경북 전체' : selectedProfileCity}
+            </p>
+          </div>
+
+          <div className="grid gap-3">
+            {filteredProfiles.length > 0 ? (
+              filteredProfiles.map((profile) => (
+                <button
+                  key={profile.profileId}
+                  type="button"
+                  onClick={() => onSelectProfile(profile.profileId)}
+                  className="grid w-full gap-4 rounded-3xl border-2 border-white bg-slate-50 p-4 text-left shadow-sm transition-colors hover:border-sky-100 hover:bg-white sm:grid-cols-[96px_1fr]"
+                >
+                  <MissingPersonPhotoSlot photoUrl={profile.photoUrl} />
+                  <div className="min-w-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-[15px] font-black text-slate-700">{profile.nm}</p>
+                        <p className="mt-1 text-[12px] font-bold text-slate-400">
+                          {profile.sexdstnDscd} · 현재 {profile.ageNow}세 · {profile.nltyDscd}
+                        </p>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[11px] font-black text-slate-500 shadow-sm">
+                        rnum {profile.rnum}
+                      </span>
                     </div>
-                    <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[11px] font-black text-slate-500 shadow-sm">
-                      rnum {profile.rnum}
-                    </span>
+                    <div className="mt-4 grid gap-2 text-[12px] font-bold text-slate-500 sm:grid-cols-2">
+                      <span>발생일 {formatPublicDataDate(profile.occrde)}</span>
+                      <span className="truncate">발생지역 {profile.occrAdres}</span>
+                      <span>신장 {profile.height}cm</span>
+                      <span>체형 {profile.frmDscd}</span>
+                    </div>
                   </div>
-                  <div className="mt-4 grid gap-2 text-[12px] font-bold text-slate-500 sm:grid-cols-2">
-                    <span>발생일 {formatPublicDataDate(profile.occrde)}</span>
-                    <span className="truncate">발생지역 {profile.occrAdres}</span>
-                    <span>신장 {profile.height}cm</span>
-                    <span>체형 {profile.frmDscd}</span>
-                  </div>
-                </div>
-              </button>
-            ))}
+                </button>
+              ))
+            ) : (
+              <div className="rounded-3xl bg-slate-50 px-5 py-8 text-center text-[13px] font-bold text-slate-400">
+                조건에 맞는 실종자 정보가 없습니다.
+              </div>
+            )}
           </div>
         </Card>
 

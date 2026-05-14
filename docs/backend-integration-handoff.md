@@ -375,15 +375,21 @@ warning
 
 중요:
 
-- 실종자 리스트는 공공데이터 API에서 받은 값 중 영천시 관련 데이터만 보여주는 것이 목표입니다.
+- 실종자 리스트는 공공데이터 API에서 받은 경북 단위 목록을 프론트에서 이름, 시/군, 발생일 순서로 필터링할 수 있게 구성했습니다.
 - 공공데이터 serviceKey는 반드시 백엔드에만 있어야 합니다.
 - 프론트에서 경찰청 공공데이터 API를 직접 호출하면 안 됩니다.
 
 추천 API:
 
 ```text
-GET /api/missing-persons?region=yeongcheon
+GET /api/missing-persons?province=gyeongbuk
 ```
+
+현재 프론트 동작:
+
+- 이름 검색: `nm` 기준 부분 일치
+- 시/군 선택: `occrAdres`에서 `영천시`, `경주시`, `포항시` 같은 시/군명을 추출해 필터링
+- 발생일 정렬: `occrde` 기준 최신순/오래된순
 
 프론트 기대 형태:
 
