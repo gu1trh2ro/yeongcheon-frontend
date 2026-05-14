@@ -391,6 +391,7 @@ GET /api/missing-persons?region=yeongcheon
 [
   {
     "profileId": "MP-001",
+    "photoUrl": "/uploads/missing-persons/MP-001.jpg",
     "rnum": 5,
     "occrde": "20230717",
     "alldressingDscd": null,
@@ -410,6 +411,8 @@ GET /api/missing-persons?region=yeongcheon
   }
 ]
 ```
+
+`photoUrl`은 선택 필드입니다. 값이 없거나 이미지 로딩에 실패하면 프론트는 실종자 리스트에 `사진 미제공` placeholder를 표시합니다.
 
 ---
 
@@ -599,4 +602,3 @@ src/components/dashboard/VacantHouseMap.tsx
 - 실종자 알림 상세 팝업이 열리는가
 - `npm run lint`가 통과하는가
 - `npm run build`가 통과하는가
-

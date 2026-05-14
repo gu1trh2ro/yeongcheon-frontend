@@ -1227,6 +1227,34 @@ function MissingDetectionLogModal({
   );
 }
 
+function MissingPersonPhotoSlot({
+  photoUrl,
+}: {
+  photoUrl?: string | null;
+}) {
+  const [hasImageError, setHasImageError] = useState(false);
+  const shouldShowPhoto = Boolean(photoUrl) && !hasImageError;
+
+  return (
+    <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-3xl border-2 border-white bg-white shadow-sm">
+      {shouldShowPhoto ? (
+        <img
+          src={photoUrl ?? ''}
+          alt="실종자 후보 사진"
+          loading="lazy"
+          onError={() => setHasImageError(true)}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-full flex-col items-center justify-center bg-slate-100 text-center">
+          <span className="text-[24px] text-slate-300">사진</span>
+          <span className="mt-1 text-[10px] font-black text-slate-400">미제공</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── 실종자 상세 ── */
 export function MissingPersonDetailCard({
   missingPersonProfiles,
@@ -1260,24 +1288,27 @@ export function MissingPersonDetailCard({
                 key={profile.profileId}
                 type="button"
                 onClick={() => onSelectProfile(profile.profileId)}
-                className="rounded-3xl border-2 border-white bg-slate-50 p-4 text-left shadow-sm transition-colors hover:border-sky-100 hover:bg-white"
+                className="grid w-full gap-4 rounded-3xl border-2 border-white bg-slate-50 p-4 text-left shadow-sm transition-colors hover:border-sky-100 hover:bg-white sm:grid-cols-[96px_1fr]"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[15px] font-black text-slate-700">{profile.nm}</p>
-                    <p className="mt-1 text-[12px] font-bold text-slate-400">
-                      {profile.sexdstnDscd} · 현재 {profile.ageNow}세 · {profile.nltyDscd}
-                    </p>
+                <MissingPersonPhotoSlot photoUrl={profile.photoUrl} />
+                <div className="min-w-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-[15px] font-black text-slate-700">{profile.nm}</p>
+                      <p className="mt-1 text-[12px] font-bold text-slate-400">
+                        {profile.sexdstnDscd} · 현재 {profile.ageNow}세 · {profile.nltyDscd}
+                      </p>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[11px] font-black text-slate-500 shadow-sm">
+                      rnum {profile.rnum}
+                    </span>
                   </div>
-                  <span className="rounded-full bg-white px-3 py-1 text-[11px] font-black text-slate-500 shadow-sm">
-                    rnum {profile.rnum}
-                  </span>
-                </div>
-                <div className="mt-4 grid gap-2 text-[12px] font-bold text-slate-500 sm:grid-cols-2">
-                  <span>발생일 {formatPublicDataDate(profile.occrde)}</span>
-                  <span>발생지역 {profile.occrAdres}</span>
-                  <span>신장 {profile.height}cm</span>
-                  <span>체형 {profile.frmDscd}</span>
+                  <div className="mt-4 grid gap-2 text-[12px] font-bold text-slate-500 sm:grid-cols-2">
+                    <span>발생일 {formatPublicDataDate(profile.occrde)}</span>
+                    <span className="truncate">발생지역 {profile.occrAdres}</span>
+                    <span>신장 {profile.height}cm</span>
+                    <span>체형 {profile.frmDscd}</span>
+                  </div>
                 </div>
               </button>
             ))}

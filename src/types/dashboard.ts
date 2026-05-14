@@ -61,6 +61,7 @@ export interface MissingPersonAlert {
 
 export interface MissingPersonPublicProfile {
   profileId: string;
+  photoUrl?: string | null;
   rnum: number;
   occrde: string;
   alldressingDscd: string | null;

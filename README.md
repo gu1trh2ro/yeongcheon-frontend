@@ -196,6 +196,7 @@ GET /api/missing-persons?region=yeongcheon
 - 공공데이터 serviceKey는 백엔드에만 둡니다.
 - 프론트에서 경찰청 공공데이터 API를 직접 호출하지 않습니다.
 - 영천시 관련 데이터만 가공해서 내려주는 것을 권장합니다.
+- 백엔드가 `photoUrl`을 내려주면 실종자 리스트의 사진 칸에 표시됩니다. 값이 없으면 `사진 미제공` placeholder가 표시됩니다.
 
 ### 실종자 발견 로그
 
