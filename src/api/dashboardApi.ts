@@ -1,5 +1,4 @@
 import {
-  dashboardSummary,
   missingPersonAlert,
   missingPersonDetectionLogs,
   missingPersonProfiles,
@@ -11,7 +10,7 @@ import {
   robotMissionTargets,
   vacantHouses,
 } from '../data/mockData';
-import { maintenancePrioritySummary } from '../data/vacantHouseDistribution';
+import { maintenancePrioritySummary, vacantHouseCsvSummary } from '../data/vacantHouseDistribution';
 import type {
   DashboardSummary,
   MaintenancePrioritySummary,
@@ -199,7 +198,12 @@ function resolveAssetUrl(path: string) {
 }
 
 export function getDashboardSummary(): Promise<DashboardSummary> {
-  return resolveMockData(dashboardSummary);
+  return resolveMockData({
+    vacantHouseCount: vacantHouseCsvSummary.totalCount,
+    highRiskHouseCount: vacantHouseCsvSummary.highRiskHouseCount,
+    todayAnomalyCount: recentEvents.filter((event) => event.type === 'VACANT_HOUSE_ANOMALY').length,
+    missingPersonCandidateCount: missingPersonDetectionLogs.length,
+  });
 }
 
 export function getVacantHouses(): Promise<VacantHouse[]> {

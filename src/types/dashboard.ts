@@ -12,7 +12,6 @@ export type EventType =
 
 export interface DashboardSummary {
   vacantHouseCount: number;
-  maintenanceRate: number;
   highRiskHouseCount: number;
   todayAnomalyCount: number;
   missingPersonCandidateCount: number;

@@ -25,7 +25,7 @@ export interface AdministrativeDongDistribution {
   gradeCounts: GradeCounts;
 }
 
-interface CsvVacantHouseRecord {
+export interface CsvVacantHouseRecord {
   sourceRowNumber: number;
   administrativeDong: string;
   legalDong: string;
@@ -220,11 +220,16 @@ function buildMaintenancePrioritySummary(
   };
 }
 
-const vacantHouseRecords = parseVacantHouseRows(vacantHouseCsv);
+export const vacantHouseRecords = parseVacantHouseRows(vacantHouseCsv);
 
 export const gradeLabels = GRADE_LABELS;
 
 export const vacantHouseDistribution = buildDistribution(vacantHouseCsv);
+
+export const vacantHouseCsvSummary = {
+  totalCount: vacantHouseRecords.length,
+  highRiskHouseCount: vacantHouseRecords.filter((record) => record.grade === '3등급' || record.grade === '4등급').length,
+};
 
 export const maintenancePrioritySummary = buildMaintenancePrioritySummary(
   vacantHouseRecords,

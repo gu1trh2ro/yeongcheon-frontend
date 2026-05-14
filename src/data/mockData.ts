@@ -1,5 +1,4 @@
 import type {
-  DashboardSummary,
   MissingPersonAlert,
   MissingPersonDetectionLog,
   MissingPersonPublicProfile,
@@ -11,14 +10,6 @@ import type {
   RobotMissionTarget,
   VacantHouse,
 } from '../types/dashboard';
-
-export const dashboardSummary: DashboardSummary = {
-  vacantHouseCount: 147,
-  maintenanceRate: 32,
-  highRiskHouseCount: 23,
-  todayAnomalyCount: 7,
-  missingPersonCandidateCount: 1,
-};
 
 export const vacantHouses: VacantHouse[] = [
   {
@@ -190,8 +181,8 @@ export const robotActivityLogs: RobotActivityLog[] = [
   {
     logId: 'LOG-001',
     timestamp: '2026-05-10T14:47:49',
-    message: '로봇 관제 화면이 모의 데이터로 초기화되었습니다.',
-    tone: 'info',
+    message: '로봇 순찰 시작: 완산동 위험 빈집 경로를 실행했습니다.',
+    tone: 'success',
   },
   {
     logId: 'LOG-002',
@@ -264,7 +255,7 @@ export const missingPersonAlert: MissingPersonAlert = {
   location: '영천시 완산동 123-4 인근',
   similarity: 82,
   description:
-    'AI/YOLO 기반 탐지 결과 실종자 후보로 분류된 이벤트입니다. 담당자 확인 필요 상태이며 신고 초안 생성이 가능합니다.',
+    'AI/YOLO 기반 탐지 결과 실종자 후보로 분류된 이벤트입니다. 담당자 확인 필요 상태로 등록되었습니다.',
   status: '담당자 확인 필요',
 };
 
@@ -340,7 +331,7 @@ export const missingPersonDetectionLogs: MissingPersonDetectionLog[] = [
     robotId: 'robot-01',
     cameraLabel: '전방 카메라',
     status: '담당자 확인 필요',
-    description: 'AI/YOLO 기반 탐지 결과 실종자 후보로 분류된 이벤트입니다. 담당자 확인 필요 상태이며 신고 초안 생성이 가능합니다.',
+    description: 'AI/YOLO 기반 탐지 결과 실종자 후보로 분류된 이벤트입니다. 담당자 확인 필요 상태로 등록되었습니다.',
     evidenceSummary: '보행자 객체, 연령대, 체형 특징이 로봇 탐지 기준과 일부 유사합니다.',
   },
   {

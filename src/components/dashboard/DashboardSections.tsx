@@ -65,13 +65,12 @@ function maintenanceGradeClass(grade: MaintenanceGrade) {
 export function SummaryStatCards({ summary }: { summary: DashboardSummary }) {
   const items = [
     { label: '전체 빈집', val: summary.vacantHouseCount.toLocaleString(), unit: '호', color: 'text-slate-700' },
-    { label: '정비 완료율', val: summary.maintenanceRate, unit: '%', color: 'text-emerald-500' },
     { label: '고위험 빈집', val: summary.highRiskHouseCount, unit: '호', color: 'text-rose-500' },
-    { label: '오늘 이상 탐지', val: summary.todayAnomalyCount, unit: '건', color: 'text-amber-500' },
+    { label: '이상 탐지', val: summary.todayAnomalyCount, unit: '건', color: 'text-amber-500' },
     { label: '실종자 후보', val: summary.missingPersonCandidateCount, unit: '건', color: 'text-rose-500' },
   ];
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5 shrink-0">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 shrink-0">
       {items.map((s) => (
         <div key={s.label} className="rounded-2xl bg-white/95 px-4 py-2.5 border-[3px] border-amber-50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] backdrop-blur-sm flex flex-col justify-center">
           <p className="text-[12px] xl:text-[13px] font-bold text-slate-500">{s.label}</p>
@@ -81,6 +80,89 @@ export function SummaryStatCards({ summary }: { summary: DashboardSummary }) {
         </div>
       ))}
     </div>
+  );
+}
+
+function overviewLogToneClass(tone: 'danger' | 'warning' | 'info' | 'success') {
+  if (tone === 'danger') return 'border-rose-300 bg-rose-50 text-rose-600';
+  if (tone === 'warning') return 'border-amber-300 bg-amber-50 text-amber-700';
+  if (tone === 'success') return 'border-emerald-300 bg-emerald-50 text-emerald-700';
+
+  return 'border-sky-300 bg-sky-50 text-sky-700';
+}
+
+function recentEventLogTone(event: RecentEvent): 'danger' | 'warning' | 'info' | 'success' {
+  if (event.severity === 'HIGH') return 'danger';
+  if (event.severity === 'MEDIUM') return 'warning';
+  if (event.status === '처리완료') return 'success';
+
+  return 'info';
+}
+
+function robotActivityLogTone(log: RobotActivityLog): 'danger' | 'warning' | 'info' | 'success' {
+  if (log.tone === 'warning') return 'warning';
+  if (log.tone === 'success') return 'success';
+
+  return 'info';
+}
+
+/* ── 통합 관제 로그 ── */
+export function OverviewActivityLogCard({
+  recentEvents,
+  robotActivityLogs,
+}: {
+  recentEvents: RecentEvent[];
+  robotActivityLogs: RobotActivityLog[];
+}) {
+  const eventLogs = recentEvents.map((event) => ({
+    id: event.eventId,
+    title: event.title,
+    detail: event.location,
+    timestamp: event.detectedAt,
+    tone: recentEventLogTone(event),
+    source: event.type === 'MISSING_PERSON_CANDIDATE' ? '실종자 후보' : event.type === 'VACANT_HOUSE_ANOMALY' ? 'AI 탐지' : '관제 이벤트',
+    priority: event.type === 'MISSING_PERSON_CANDIDATE'
+      ? 4
+      : event.type === 'VACANT_HOUSE_ANOMALY'
+        ? 3
+        : 1,
+  }));
+  const robotLogs = robotActivityLogs.map((log) => ({
+    id: log.logId,
+    title: log.message,
+    detail: 'robot-01 순찰 로그',
+    timestamp: log.timestamp,
+    tone: robotActivityLogTone(log),
+    source: '로봇 순찰',
+    priority: log.tone === 'success' ? 2 : 1,
+  }));
+  const logs = [
+    ...eventLogs.filter((log) => log.priority >= 3),
+    ...robotLogs,
+    ...eventLogs.filter((log) => log.priority < 3),
+  ]
+    .sort((a, b) => b.priority - a.priority || new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, 4);
+
+  return (
+    <Card title="관제 로그" eyebrow="로봇·AI 이벤트" className="flex h-full min-h-0 flex-col">
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 custom-scrollbar">
+        {logs.map((log) => (
+          <article key={log.id} className={`rounded-2xl border-2 px-3 py-2 shadow-sm ${overviewLogToneClass(log.tone)}`}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-[12px] xl:text-[13px] font-black">{log.title}</p>
+                <p className="mt-1 truncate text-[11px] font-bold opacity-75">{log.detail}</p>
+              </div>
+              <span className="shrink-0 rounded-full bg-white/70 px-2 py-1 text-[10px] font-black">
+                {log.source}
+              </span>
+            </div>
+            <p className="mt-1 text-[11px] font-bold opacity-70">{fmtDateTime(log.timestamp)}</p>
+          </article>
+        ))}
+      </div>
+    </Card>
   );
 }
 
@@ -240,12 +322,25 @@ export function RouteMapCard({
   compact?: boolean;
 }) {
   const polylinePoints = patrolRoute.points.map((point) => `${point.viewX},${point.viewY}`).join(' ');
+  const getLabelPosition = (point: PatrolRoute['points'][number]) => {
+    const left = (point.viewX / 480) * 100;
+    const top = (point.viewY / 240) * 100;
+
+    if (!compact) {
+      return { left: `${left}%`, top: `${top}%` };
+    }
+
+    return {
+      left: `${Math.min(82, Math.max(16, left))}%`,
+      top: `${Math.min(82, Math.max(18, top))}%`,
+    };
+  };
 
   return (
     <Card
       title="순찰 경로"
       eyebrow="도로 그래프 연동 준비"
-      className={`h-full flex flex-col ${compact ? 'min-h-[280px]' : 'min-h-[340px]'}`}
+      className={`h-full flex flex-col ${compact ? 'min-h-0' : 'min-h-[340px]'}`}
     >
       <div className={`relative flex-1 min-h-0 bg-sky-50 border-4 border-white overflow-hidden rounded-3xl shadow-sm`}>
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet">
@@ -273,11 +368,11 @@ export function RouteMapCard({
           <div
             key={point.pointId}
             className="absolute -translate-x-1/2 text-center pointer-events-none"
-            style={{ left: `${(point.viewX / 480) * 100}%`, top: `${(point.viewY / 240) * 100}%` }}
+            style={getLabelPosition(point)}
           >
-            <span className={`bg-white border-2 px-3 py-1.5 text-[12px] font-black rounded-full shadow-sm ${
+            <span className={`inline-block max-w-[92px] overflow-hidden text-ellipsis whitespace-nowrap bg-white border-2 shadow-sm ${
               point.isCompleted ? 'border-sky-100 text-sky-600' : 'border-slate-100 text-slate-500'
-            }`}>
+            } ${compact ? 'rounded-full px-2 py-1 text-[10px]' : 'rounded-full px-3 py-1.5 text-[12px]'}`}>
               {point.label}
             </span>
           </div>
@@ -1122,11 +1217,8 @@ function MissingDetectionLogModal({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <button type="button" className="flex-1 rounded-2xl bg-rose-500 px-5 py-4 text-[15px] font-black text-white shadow-[0_4px_12px_rgba(244,63,94,0.3)] transition-all hover:bg-rose-600">
-            신고 초안 생성
-          </button>
-          <button type="button" className="flex-1 rounded-2xl border-2 border-slate-200 bg-white px-5 py-4 text-[15px] font-black text-slate-600 shadow-sm transition-colors hover:bg-slate-50">
+        <div>
+          <button type="button" className="w-full rounded-2xl border-2 border-slate-200 bg-white px-5 py-4 text-[15px] font-black text-slate-600 shadow-sm transition-colors hover:bg-slate-50">
             담당자 검토 표시
           </button>
         </div>

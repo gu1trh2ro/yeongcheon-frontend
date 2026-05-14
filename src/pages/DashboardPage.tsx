@@ -8,7 +8,7 @@ import {
   RobotControlDashboard,
   MaintenancePriorityTable,
   ReconstructionRecommendCard,
-  MissingPersonSummary,
+  OverviewActivityLogCard,
   MissingPersonDetailCard,
   AiAnomalySummary,
 } from '../components/dashboard/DashboardSections';
@@ -16,7 +16,6 @@ import {
   analyzeReconstructionRecommendation,
   getDashboardSummary,
   getMaintenancePriority,
-  getMissingPersonAlert,
   getMissingPersonDetectionLogs,
   getMissingPersonProfiles,
   getPatrolArrivalPhotos,
@@ -30,7 +29,6 @@ import {
 import type {
   DashboardSummary,
   MaintenancePrioritySummary,
-  MissingPersonAlert,
   MissingPersonDetectionLog,
   MissingPersonPublicProfile,
   PatrolArrivalPhoto,
@@ -55,7 +53,6 @@ interface DashboardData {
   robotMissionTargets: RobotMissionTarget[];
   robotActivityLogs: RobotActivityLog[];
   reconstructionRecommendation: ReconstructionRecommendation;
-  missingPersonAlert: MissingPersonAlert;
   missingPersonProfiles: MissingPersonPublicProfile[];
   missingPersonDetectionLogs: MissingPersonDetectionLog[];
 }
@@ -75,6 +72,16 @@ function DashboardStateMessage({
   );
 }
 
+function formatDashboardTime(value: string) {
+  return new Intl.DateTimeFormat('ko-KR', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(value));
+}
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<TabType>('통합 대시보드');
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
@@ -85,6 +92,7 @@ export default function DashboardPage() {
   const [selectedMissingProfileId, setSelectedMissingProfileId] = useState<string | null>(null);
   const [isAnalyzingRecommendation, setIsAnalyzingRecommendation] = useState(false);
   const [recommendationError, setRecommendationError] = useState<string | null>(null);
+  const [pendingMissingAlertLog, setPendingMissingAlertLog] = useState<MissingPersonDetectionLog | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -104,7 +112,6 @@ export default function DashboardPage() {
           robotMissionTargets,
           robotActivityLogs,
           reconstructionRecommendation,
-          missingPersonAlert,
           missingPersonProfiles,
           missingPersonDetectionLogs,
         ] = await Promise.all([
@@ -117,7 +124,6 @@ export default function DashboardPage() {
           getRobotMissionTargets(),
           getRobotActivityLogs(),
           getReconstructionRecommendation(),
-          getMissingPersonAlert(),
           getMissingPersonProfiles(),
           getMissingPersonDetectionLogs(),
         ]);
@@ -134,13 +140,15 @@ export default function DashboardPage() {
           robotMissionTargets,
           robotActivityLogs,
           reconstructionRecommendation,
-          missingPersonAlert,
           missingPersonProfiles,
           missingPersonDetectionLogs,
         });
         setSelectedAiHouseId(vacantHouses[0]?.houseId ?? null);
         setSelectedMissingLogId(null);
         setSelectedMissingProfileId(null);
+        setPendingMissingAlertLog(
+          missingPersonDetectionLogs.find((log) => log.status === '담당자 확인 필요') ?? null,
+        );
       } catch {
         if (!isMounted) return;
 
@@ -163,6 +171,7 @@ export default function DashboardPage() {
     dashboardData?.vacantHouses.find((house) => house.houseId === selectedAiHouseId)
     ?? dashboardData?.vacantHouses[0]
     ?? null;
+  const alertTabs: TabType[] = pendingMissingAlertLog ? ['실종자 알림'] : [];
 
   function handleSelectAiHouse(houseId: string) {
     setSelectedAiHouseId(houseId);
@@ -200,6 +209,14 @@ export default function DashboardPage() {
     } finally {
       setIsAnalyzingRecommendation(false);
     }
+  }
+
+  function handleOpenMissingAlert() {
+    if (!pendingMissingAlertLog) return;
+
+    setSelectedMissingLogId(pendingMissingAlertLog.logId);
+    setPendingMissingAlertLog(null);
+    setActiveTab('실종자 알림');
   }
 
   return (
@@ -263,7 +280,7 @@ export default function DashboardPage() {
           {/* 좌측 사이드바 (툴 메뉴) */}
 
           <div className="w-[140px] xl:w-[160px] shrink-0 h-full">
-            <Header tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
+            <Header tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} alertTabs={alertTabs} />
           </div>
 
           {/* 메인 콘텐츠 프레임 (내부 스크롤) */}
@@ -302,11 +319,12 @@ export default function DashboardPage() {
                       </div>
 
                       {/* Column 3: AI & Alerts */}
-                      <div className="flex flex-col gap-6 h-full min-h-0">
-                        <MissingPersonSummary missingPersonAlert={dashboardData.missingPersonAlert} />
-                        <div className="flex-1 min-h-0">
-                          <RouteMapCard patrolRoute={dashboardData.patrolRoute} compact />
-                        </div>
+                      <div className="grid h-full min-h-0 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] gap-4 xl:gap-6">
+                        <OverviewActivityLogCard
+                          recentEvents={dashboardData.recentEvents}
+                          robotActivityLogs={dashboardData.robotActivityLogs}
+                        />
+                        <RouteMapCard patrolRoute={dashboardData.patrolRoute} compact />
                       </div>
 
                     </div>
@@ -362,6 +380,55 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {pendingMissingAlertLog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-6 py-8 backdrop-blur-sm">
+          <section className="w-full max-w-xl rounded-[2rem] border-4 border-white bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.28)]">
+            <span className="inline-flex rounded-full bg-rose-500 px-4 py-2 text-[13px] font-black text-white shadow-sm">
+              긴급 확인 요망
+            </span>
+            <h2 className="mt-5 text-[24px] font-black text-slate-800">
+              로봇이 실종자 후보 이벤트를 탐지했습니다
+            </h2>
+            <p className="mt-3 text-[14px] font-bold leading-relaxed text-slate-600">
+              AI/YOLO 탐지 결과가 담당자 확인 필요 상태로 등록되었습니다. 실종자 확정이 아니며,
+              담당자가 상세 내용을 검토해야 합니다.
+            </p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl bg-rose-50 px-4 py-3">
+                <p className="text-[12px] font-bold text-rose-400">유사도</p>
+                <p className="mt-1 text-[18px] font-black text-rose-500">{pendingMissingAlertLog.similarity}%</p>
+              </div>
+              <div className="rounded-2xl bg-slate-50 px-4 py-3">
+                <p className="text-[12px] font-bold text-slate-400">탐지 시각</p>
+                <p className="mt-1 text-[15px] font-black text-slate-700">
+                  {formatDashboardTime(pendingMissingAlertLog.detectedAt)}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-sky-50 px-4 py-3">
+                <p className="text-[12px] font-bold text-sky-400">탐지 위치</p>
+                <p className="mt-1 text-[14px] font-black text-slate-700">{pendingMissingAlertLog.location}</p>
+              </div>
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={handleOpenMissingAlert}
+                className="flex-1 rounded-2xl bg-rose-500 px-5 py-4 text-[15px] font-black text-white shadow-[0_4px_12px_rgba(244,63,94,0.3)] transition-all hover:bg-rose-600"
+              >
+                실종자 알림에서 확인
+              </button>
+              <button
+                type="button"
+                onClick={() => setPendingMissingAlertLog(null)}
+                className="flex-1 rounded-2xl border-2 border-slate-200 bg-white px-5 py-4 text-[15px] font-black text-slate-600 shadow-sm transition-colors hover:bg-slate-50"
+              >
+                나중에 확인
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
     </div>
   );

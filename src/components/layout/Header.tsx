@@ -2,10 +2,11 @@ interface HeaderProps<T extends string> {
   tabs: readonly T[];
   activeTab: T;
   onTabChange: (tab: T) => void;
+  alertTabs?: readonly T[];
 }
 
 export default function Header<T extends string>({
-  tabs, activeTab, onTabChange,
+  tabs, activeTab, onTabChange, alertTabs = [],
 }: HeaderProps<T>) {
   return (
     <header className="w-full h-full flex flex-col pt-4">
@@ -23,6 +24,8 @@ export default function Header<T extends string>({
       <nav className="flex flex-col gap-2 px-1" aria-label="대시보드 탭">
         {tabs.map((tab) => {
           const isActive = tab === activeTab;
+          const hasAlert = alertTabs.includes(tab);
+
           return (
             <button
               key={tab}
@@ -37,7 +40,17 @@ export default function Header<T extends string>({
               `}
               aria-pressed={isActive}
             >
-              {tab}
+              <span className="min-w-0 flex-1 truncate">{tab}</span>
+              {hasAlert && (
+                <span
+                  aria-label={`${tab} 새 알림`}
+                  className={`ml-2 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[12px] font-black ${
+                    isActive ? 'bg-white text-rose-500' : 'bg-rose-500 text-white shadow-sm'
+                  }`}
+                >
+                  !
+                </span>
+              )}
             </button>
           );
         })}

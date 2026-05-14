@@ -65,6 +65,9 @@ interface NaverMapsNamespace {
   Marker: new (options: NaverMarkerOptions) => NaverMarker;
   Point: new (x: number, y: number) => NaverPoint;
   Size: new (width: number, height: number) => NaverSize;
+  Event: {
+    trigger(target: NaverMap, eventName: string): void;
+  };
 }
 
 declare global {
@@ -169,6 +172,15 @@ function loadNaverMapScript(clientId: string) {
   });
 
   return naverMapScriptPromise;
+}
+
+function refreshNaverMapView(maps: NaverMapsNamespace, map: NaverMap) {
+  const center = new maps.LatLng(YEONGCHEON_CENTER.lat, YEONGCHEON_CENTER.lng);
+
+  window.requestAnimationFrame(() => {
+    maps.Event.trigger(map, 'resize');
+    map.setCenter(center);
+  });
 }
 
 function escapeHtml(value: string | number) {
@@ -417,6 +429,8 @@ export default function VacantHouseMap() {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<NaverMap | null>(null);
   const markersRef = useRef<NaverMarker[]>([]);
+  const [isContainerReady, setIsContainerReady] = useState(false);
+  const [isContainerVisible, setIsContainerVisible] = useState(false);
   const [mapStatus, setMapStatus] = useState<MapStatus>(naverMapClientId ? 'loading' : 'fallback');
   const [fallbackReason, setFallbackReason] = useState(
     naverMapClientId
@@ -425,15 +439,96 @@ export default function VacantHouseMap() {
   );
 
   useEffect(() => {
+    if (!naverMapClientId) {
+      return undefined;
+    }
+
+    const element = mapElementRef.current;
+
+    if (!element) return undefined;
+
+    let frameId = 0;
+
+    const measureAndRefreshMap = () => {
+      const rect = element.getBoundingClientRect();
+      const hasUsableSize = rect.width > 120 && rect.height > 120;
+
+      if (hasUsableSize) {
+        setIsContainerReady(true);
+      }
+
+      const maps = getNaverMaps();
+
+      if (hasUsableSize && maps && mapRef.current) {
+        refreshNaverMapView(maps, mapRef.current);
+      }
+    };
+
+    const scheduleMeasure = () => {
+      window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(measureAndRefreshMap);
+    };
+
+    const resizeObserver = typeof ResizeObserver === 'undefined'
+      ? null
+      : new ResizeObserver(scheduleMeasure);
+    const intersectionObserver = typeof IntersectionObserver === 'undefined'
+      ? null
+      : new IntersectionObserver((entries) => {
+        const isVisible = entries.some((entry) => entry.isIntersecting);
+
+        setIsContainerVisible(isVisible);
+
+        if (isVisible) {
+          scheduleMeasure();
+        }
+      }, { threshold: 0.1 });
+
+    resizeObserver?.observe(element);
+    intersectionObserver?.observe(element);
+    if (!intersectionObserver) {
+      setIsContainerVisible(true);
+    }
+    window.addEventListener('resize', scheduleMeasure);
+    scheduleMeasure();
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener('resize', scheduleMeasure);
+      resizeObserver?.disconnect();
+      intersectionObserver?.disconnect();
+    };
+  }, [naverMapClientId]);
+
+  useEffect(() => {
+    const maps = getNaverMaps();
+
+    if (!isContainerVisible || !maps || !mapRef.current) {
+      return undefined;
+    }
+
+    const refreshVisibleMap = () => {
+      if (mapRef.current) {
+        refreshNaverMapView(maps, mapRef.current);
+      }
+    };
+    const timeoutIds = [0, 160, 420].map((delay) => window.setTimeout(refreshVisibleMap, delay));
+
+    return () => {
+      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    };
+  }, [isContainerVisible]);
+
+  useEffect(() => {
     let isMounted = true;
 
-    if (!naverMapClientId) {
+    if (!naverMapClientId || !isContainerReady) {
       return undefined;
     }
 
     loadNaverMapScript(naverMapClientId)
       .then((maps) => {
-        if (!isMounted || !mapElementRef.current) return;
+        if (!isMounted || !mapElementRef.current || mapRef.current) return;
 
         const center = new maps.LatLng(YEONGCHEON_CENTER.lat, YEONGCHEON_CENTER.lng);
         const map = new maps.Map(mapElementRef.current, {
@@ -459,6 +554,7 @@ export default function VacantHouseMap() {
           })
         ));
 
+        refreshNaverMapView(maps, map);
         setMapStatus('ready');
       })
       .catch(() => {
@@ -477,7 +573,7 @@ export default function VacantHouseMap() {
       markersRef.current = [];
       mapRef.current = null;
     };
-  }, [naverMapClientId]);
+  }, [isContainerReady, naverMapClientId]);
 
   return (
     <Card title="영천시 빈집 분포 현황" eyebrow="행정동별 등급 집계" className="flex h-full flex-col">
